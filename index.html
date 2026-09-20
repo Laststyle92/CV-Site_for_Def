@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Резюме — Альминов Руслан Константинович</title>
+<meta name="description" content="Резюме и портфолио — Имя Фамилия, ваша профессия">
+
+<!--
+================================================================================
+  КАК УСТРОЕН ЭТОТ ФАЙЛ (читайте перед редактированием)
+================================================================================
+  1. <style>  — все стили сайта: цвета, шрифты, 3D-книга, "плашки", анимации.
+  2. <body>   — сама разметка, сверху вниз:
+       - курсор (cursorCanvas, падающая звезда со шлейфом) — не трогайте, это декор
+       - шапка (hero) — имя, профессия, короткое вступление, фотография
+       - секция "Опыт работы" — 3D-книга на 4 страницы
+       - секция "Обо мне"
+       - секция "Навыки"
+       - секция "Образование и сертификаты"
+       - секция "Контакты"
+       - подвал
+  3. <script> — вся логика: курсор, фон, листание книги, цвет страниц.
+================================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,480;0,9..144,600;1,9..144,480&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     1. СБРОС И БАЗА
+  ============================================================ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  button { font-family: inherit; }
+
+  /* ============================================================
+     2. ЦВЕТОВАЯ СХЕМА И ТИПОГРАФИКА (дизайн-токены)
+  ============================================================ */
+  :root {
+    --bg-0: #8B0000;
+    --bg-1: #000000;
+    --surface: rgba(255,255,255,0.045);
+    --surface-strong: rgba(255,255,255,0.07);
+    --surface-border: rgba(255,255,255,0.10);
+
+    --text-0: #F3EFE4;
+    --text-1: #B6BECC;
+    --text-2: #6C7688;
+
+    --gold: #E7B24C;
+    --gold-soft: #F2CE84;
+    --violet: #8C7FEA;
+    --violet-soft: #B4ACFF;
+    --sage: #0b285e;
+    --clay: #02481e;
+
+    --paper-0: #F4EEDD;
+    --paper-1: #E8DCBF;
+    --ink: #24201A;
+
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+
+    --page-accent: var(--gold);
+    --container: 1180px;
+  }
+
+  @property --page-accent {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: #E7B24C;
+  }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 500; margin: 0; color: var(--text-0); }
+  p { margin: 0; }
+
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  ::selection { background: var(--gold); color: #1a1206; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold-soft);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ============================================================
+     3. КУРСОР — падающая звезда со шлейфом
+  ============================================================ */
+  #cursorCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  body.has-custom-cursor #cursorCanvas { opacity: 1; }
+  @media (pointer: fine) {
+    body.has-custom-cursor, body.has-custom-cursor a, body.has-custom-cursor button,
+    body.has-custom-cursor .plate, body.has-custom-cursor .page, body.has-custom-cursor .dot {
+      cursor: none;
+    }
+  }
+
+  /* ============================================================
+     4. ФОНОВЫЕ 3D-АНИМАЦИИ
+  ============================================================ */
+  .starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: #000;
+    background-image:
+      radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+      radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+      radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+      radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+  }
+  #bgCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: .18;
+  }
+  .orb-1 {
+    width: 46vw; height: 46vw;
+    background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 70%);
+    top: -12vw; left: -10vw;
+    animation: float-a 26s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(255,255,255,0.45), transparent 70%);
+    bottom: -14vw; right: -8vw;
+    animation: float-b 32s ease-in-out infinite;
+  }
+  @keyframes float-a {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(3vw, 4vw) scale(1.08); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-4vw, -3vw) scale(1.1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orb-1, .orb-2 { animation: none; }
+  }
+
+  main, header, footer { position: relative; z-index: 1; }
+
+  /* ============================================================
+     5. ШАПКА / HERO И ВЕРХНЯЯ ПАНЕЛЬ
+  ============================================================ */
+  .topbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    min-height: 72px;
+    padding: .8rem clamp(1.25rem, 4vw, 3rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(0, 0, 0, .82);
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .brandmark {
+    position: static;
+    z-index: auto;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    letter-spacing: .01em;
+    color: var(--text-0);
+    text-decoration: none;
+    mix-blend-mode: normal;
+    min-width: 0;
+  }
+  .brandmark span { color: var(--gold-soft); }
+
+  .quick-contact {
+    position: static;
+    z-index: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .6rem 1.2rem;
+    min-width: 118px;
+    border-radius: 8px;
+    background: var(--surface-strong);
+    border: 1px solid var(--surface-border);
+    color: var(--text-0);
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color .3s ease, transform .3s ease, background .3s ease;
+    flex-shrink: 0;
+  }
+  .quick-contact:hover {
+    border-color: var(--gold-soft);
+    background: rgba(255,255,255,.10);
+    transform: translateY(-1px);
+  }
+
+  .hero {
+    padding: clamp(9rem, 15vw, 11rem) 0 clamp(3rem, 6vw, 5rem);
+  }
+  .hero-eyebrow-role {
+    font-size: .95rem;
+    color: var(--violet-soft);
+    font-weight: 600;
+    margin-bottom: .9rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    max-width: 16ch;
+    font-weight: 480;
+  }
+  .hero-intro {
+    margin-top: 1.5rem;
+    max-width: 56ch;
+    font-size: 1.1rem;
+    color: var(--text-1);
+  }
+  .hero-scrollcue {
+    margin-top: 3.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    color: var(--text-2);
+    font-size: .875rem;
+    text-decoration: none;
+  }
+  .hero-scrollcue svg { width: 14px; height: 14px; animation: bob 2.2s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0);} 50% { transform: translateY(5px);} }
+  @media (prefers-reduced-motion: reduce) { .hero-scrollcue svg { animation: none; } }
+
+  /* Двухколоночная сетка для шапки с фото справа */
+  .hero-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+
+  .hero-text {
+    flex: 1;
+  }
+
+  .hero-avatar {
+    flex-shrink: 0;
+  }
+
+  .hero-avatar img {
+    width: 320px !important;
+    height: 400px !important;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 850px) {
+    .hero-grid {
+      flex-direction: column-reverse;
+      text-align: center;
+      gap: 2rem;
+    }
+    .hero-text h1, .hero-intro {
+      margin-inline: auto;
+    }
+    .hero-avatar img {
+      width: 240px !important;
+      height: 300px !important;
+    }
+  }
+
+  /* ============================================================
+     6. ОБЩИЕ ЭЛЕМЕНТЫ СЕКЦИЙ
+  ============================================================ */
+  .section { padding: clamp(3.5rem, 7vw, 6rem) 0; }
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  }
+  .section-note {
+    color: var(--text-2);
+    font-size: .95rem;
+    max-width: 34ch;
+  }
+
+  /* ============================================================
+     7. КНИГА ОПЫТА (3D flipbook)
+  ============================================================ */
+  .book-section { --page-accent: var(--gold); }
+
+  .book-stage {
+    perspective: 2600px;
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0 2.5rem;
+  }
+  .book {
+    position: relative;
+    width: min(92vw, 640px);
+    height: clamp(420px, 58vw, 540px);
+    transform-style: preserve-3d;
+    transform: rotateX(5deg) rotateY(-6deg);
+    transition: transform .5s ease;
+  }
+  .book::after {
+    content: "";
+    position: absolute;
+    left: 6%; right: 6%; bottom: -34px;
+    height: 60px;
+    background: radial-gradient(ellipse at center, color-mix(in srgb, var(--page-accent) 45%, transparent), transparent 72%);
+    filter: blur(18px);
+    z-index: -1;
+    transition: background .6s ease;
+  }
+  .page {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+    transition: transform .95s cubic-bezier(.5,.05,.15,1);
+  }
+  .page.flipped { transform: rotateY(-172deg); }
+
+  .page-front, .page-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  .page-bg {
+    position: absolute;
+    inset: -18px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(3px) saturate(1.15);
+    transform: scale(1.08);
+    z-index: 0;
+  }
+  .page-bg[data-bg="0"] { background-image: url("images/company1.png"); }
+  .page-bg[data-bg="1"] { background-image: url("images/company2.png"); }
+  .page-bg[data-bg="2"] { background-image: url("images/company3.png"); }
+  .page-bg[data-bg="3"] { background-image: url("images/company4.png"); }
+
+  .page-tint {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(155deg, color-mix(in srgb, var(--page-accent) 28%, transparent) 0%, rgba(10,13,20,0.58) 72%);
+  }
+  .page-front {
+    border: 1px solid color-mix(in srgb, var(--page-accent) 45%, var(--surface-border) 55%);
+    box-shadow: 0 40px 70px -30px color-mix(in srgb, var(--page-accent) 55%, transparent);
+    transition: border-color .6s ease, box-shadow .6s ease;
+  }
+  .page-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    padding: clamp(1.6rem, 4vw, 2.75rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .page-index {
+    font-size: .8rem;
+    color: var(--text-2);
+    margin-bottom: auto;
+  }
+  .page-company {
+    display: flex;
+    align-items: baseline;
+    gap: .7rem;
+    margin-top: 1rem;
+  }
+  .page-company-bar {
+    width: 3px;
+    height: 1.4em;
+    background: var(--page-accent);
+    border-radius: 2px;
+    transition: background .6s ease;
+  }
+  .page-content h3 {
+    font-size: clamp(1.35rem, 3vw, 1.85rem);
+    color: var(--text-0);
+    font-weight: 500;
+  }
+  .page-role {
+    margin-top: .35rem;
+    color: var(--text-1);
+    font-size: .95rem;
+  }
+  .page-body {
+    margin-top: 1.1rem;
+    color: var(--text-1);
+    font-size: .95rem;
+    line-height: 1.65;
+    max-width: 54ch;
+    overflow-y: auto;
+  }
+  .page-tags {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .page-tag {
+    font-size: .78rem;
+    color: var(--text-0);
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--page-accent) 20%, rgba(255,255,255,0.06));
+    border: 1px solid color-mix(in srgb, var(--page-accent) 35%, var(--surface-border));
+  }
+
+  .page-back {
+    background:
+      repeating-linear-gradient(180deg, rgba(36,32,26,0.05) 0px, rgba(36,32,26,0.05) 1px, transparent 1px, transparent 25px),
+      linear-gradient(160deg, var(--paper-0), var(--paper-1));
+    transform: rotateY(180deg);
+    box-shadow: inset 0 0 60px rgba(36,32,26,0.18);
+  }
+
+  .book-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+  }
+  .book-nav button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text-0);
+    display: grid;
+    place-items: center;
+    transition: border-color .3s ease, background .3s ease, opacity .3s ease, transform .2s ease;
+  }
+  .book-nav button:hover:not(:disabled) { border-color: var(--page-accent); transform: translateY(-1px); }
+  .book-nav button:disabled { opacity: .3; }
+  .book-nav button svg { width: 16px; height: 16px; }
+
+  .book-dots { display: flex; gap: .55rem; }
+  .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-strong);
+    padding: 0;
+    transition: background .4s ease, transform .3s ease;
+  }
+  .dot.active { background: var(--page-accent); transform: scale(1.3); }
+
+  @media (max-width: 640px) {
+    .topbar { min-height: 62px; padding: .7rem 1rem; }
+    .brandmark { font-size: .95rem; }
+    .quick-contact { min-width: 96px; padding: .5rem .85rem; font-size: .82rem; }
+    .hero { padding-top: 7.8rem; }
+    .book { transform: rotateX(3deg) rotateY(-3deg); }
+    .page-body { -webkit-line-clamp: unset; }
+  }
+
+  /* ============================================================
+     8. ПЛАШКИ
+  ============================================================ */
+  .plate {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-left: 3px solid var(--gold);
+    border-radius: 10px;
+    padding: 1.5rem 1.65rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    will-change: transform;
+  }
+  .plate--violet { border-left-color: var(--violet); }
+  .plate h3, .plate h4 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-0);
+  }
+  .plate p { color: var(--text-1); font-size: .93rem; margin-top: .5rem; }
+
+  /* ============================================================
+     9. ОБО МНЕ
+  ============================================================ */
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.8fr); /* Расширяем правую колонку */
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .about-plate {
+    padding: 2.0rem 3.8rem !important; /* Увеличенные внутренние отступы */
+    min-height: 240px;                 /* Дополнительная минимальная высота */
+    border-left-width: 10px;             /* Более выразительный золотой акцент слева */
+  }
+
+  .about-plate p {
+    font-size: 1.12rem !important;      /* Крупный, читаемый шрифт */
+    line-height: 1.8 !important;        /* Увеличенный межстрочный интервал */
+  }
+
+  @media (max-width: 800px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-plate {
+      padding: 1.8rem 1.8rem !important;
+    }
+  }
+
+  /* ============================================================
+     10. НАВЫКИ
+  ============================================================ */
+  .skills-wrap { display: flex; flex-wrap: wrap; gap: .9rem; }
+  .skill-plate {
+    flex: 1 1 220px;
+    max-width: 320px;
+  }
+
+  /* ============================================================
+     11. ОБРАЗОВАНИЕ
+  ============================================================ */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 1.25rem;
+  }
+  @media (max-width: 700px) { .edu-grid { grid-template-columns: 1fr; } }
+  .edu-period { font-size: .82rem; color: var(--text-2); margin-top: .15rem; }
+
+  /* ============================================================
+     12. КОНТАКТЫ
+  ============================================================ */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0,0.9fr) minmax(0,1.1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
+  .contact-list { display: flex; flex-direction: column; gap: .8rem; }
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: 1rem 1.2rem;
+  }
+  .contact-row .icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--gold) 18%, rgba(255,255,255,0.05));
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .contact-row .icon svg { width: 16px; height: 16px; color: var(--gold-soft); }
+  .contact-row .label { font-size: .78rem; color: var(--text-2); }
+  .contact-row .value { font-size: .98rem; color: var(--text-0); font-weight: 600; text-decoration: none; }
+  .contact-row .value:hover { color: var(--gold-soft); }
+
+  footer {
+    padding: 2.5rem 0 3.5rem;
+    text-align: center;
+    color: var(--text-2);
+    font-size: .85rem;
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="cursorCanvas"></canvas>
+  <div class="starfield"></div>
+  <canvas id="bgCanvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+  <div class="topbar">
+    <a href="#top" class="brandmark" id="top">Руслан<span> Альминов</span></a>
+    <a href="#contact" class="quick-contact">Написать</a>
+  </div>
+
+  <main>
+    <!-- ============================================================
+         ШАПКА (HERO) — ТЕКСТ СЛЕВА, ФОТО СПРАВА
+    ============================================================ -->
+    <header class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <p class="hero-eyebrow-role">Профессия и специализация</p>
+          <h1>Руслан Альминов</h1>
+          <p class="hero-intro">
+            Администратор банковских систем | Backend & Automation Specialist
+          <p class=class="hero-intro">
+            Я объединяю практический опыт банковского обслуживания с инженерным подходом к IT. Настраиваю системные процессы, работаю с АБС, CRM и API, а также создаю скрипты автоматизации (Python, PowerShell, n8n), чтобы превратить рутину в надежно работающие алгоритмы.
+          </p>
+          <a href="#experience" class="hero-scrollcue">
+            Смотреть опыт работы
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+          </a>
+        </div>
+
+        <!-- Аватарка в правой части -->
+        <div class="hero-avatar">
+          <img src="images/photo.png" alt="Фото">
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         ОПЫТ РАБОТЫ — 3D КНИГА НА 4 СТРАНИЦЫ
+    ============================================================ -->
+    <section class="section book-section" id="experience">
+      <div class="container">
+        <div class="section-head">
+          <h2>Опыт работы</h2>
+          <p class="section-note">Пролистайте книгу стрелками или точками ниже — каждая страница отдельное место работы.</p>
+        </div>
+      </div>
+
+      <div class="book-stage">
+        <div class="book" id="book">
+
+          <!-- СТРАНИЦА 1 -->
+          <div class="page" data-index="0">
+            <div class="page-front">
+              <div class="page-bg" data-bg="0"></div>
+              <div class="page-tint"></div>
+              <div class="page-content">
+                <p class="page-index">Страница 1 из 4</p>
+                <div class="page-company">
+                  <span class="page-company-bar"></span>
+                  <h3>IT|Программирование (Backend & Автоматизация)</h3>
+                </div>
+                <p class="page-role">Програмирование — 06.2025 – до сих пор</p>
+                <p class="page-body">
+                  Занимаюсь backend-разработкой и автоматизацией. Разрабатываю проектирую логику взаимодействия приложений с базами данных и внешними сервисами через API. Все ключевые проекты и исходный код представлены в моем репозитории:
+                  Используемый стек и программное обеспечение:
+                  IDE и среда разработки: PyCharm Professional.
+                  Языки программирования и скриптинг: Python, PowerShell.
+                  Базы данных и API: PostgreSQL, pgAdmin, проектирование и работа с REST API.
+                  Системы контроля версий: Git, GitHub.
+                  Low-Code.
+                </p>
+                <div class="page-tags">
+                  <span class="page-tag">Python</span>
+                  <span class="page-tag">PowerShell</span>
+                  <span class="page-tag">PostgreSQL</span>
+                  <span class="page-tag">pgAdmin</span>
+                </div>
+              </div>
+            </div>
+            <div class="page-back"></div>
+          </div>
+
+          <!-- СТРАНИЦА 2 -->
+          <div class="page" data-index="1">
+            <div class="page-front">
+              <div class="page-bg" data-bg="1"></div>
+              <div class="page-tint"></div>
+              <div class="page-content">
+                <p class="page-index">Страница 2 из 4</p>
+                <div class="page-company">
+                  <span class="page-company-bar"></span>
+                  <h3>Asian Business Group</h3>
+                </div>
+                <p class="page-role">Стажер юридического отдела / Помощник главного юриста — 06.2019г — 08.2019 г</p>
+                <p class="page-body">
+                  Оказывал всестороннюю помощь главному юристу компании в подготовке правовых заключений, сборе и анализе нормативно-правовой базы.
+                  Осуществлял трехязычный письменный перевод (русский, английский, таджикский) юридической документации, договоров, соглашений и официальной переписки.
+                  Участвовал в первичной правовой экспертизе, структурировании договоров и систематизации архива юридических дел.
+                  Выполнял аналитические и административные поручения, обеспечивая стабильное правовое сопровождение проектов компании.
+                </p>
+                <div class="page-tags">
+                  <span class="page-tag">Таблицы Exel</span>
+                  <span class="page-tag">Документы Word</span>
+                  <span class="page-tag">Презинтации PowerPoint</span>
+                </div>
+              </div>
+            </div>
+            <div class="page-back"></div>
+          </div>
+
+          <!-- СТРАНИЦА 3 -->
+          <div class="page" data-index="2">
+            <div class="page-front">
+              <div class="page-bg" data-bg="2"></div>
+              <div class="page-tint"></div>
+              <div class="page-content">
+                <p class="page-index">Страница 3 из 4</p>
+                <div class="page-company">
+                  <span class="page-company-bar"></span>
+                  <h3>Промышленный сектор ҶСП "Комбинати Шири Душанбе"</h3>
+                </div>
+                <p class="page-role">Оператор производственного оборудования  — 11.2021 — 03.2022</p>
+                <p class="page-body">
+                  Отвечал за непрерывную, стабильную и безопасную работу технологического оборудования на производстве.
+                  Проводил первичную калибровку, пусконаладку, физическую и программную настройку рабочих параметров машины перед запуском производственных циклов.
+                  Осуществлял постоянный мониторинг состояния техники, оперативно выявлял и устранял как программные ошибки, так и аппаратные неисправности.
+                  Обеспечивал строгое соблюдение регламентов технологического процесса и норм техники безопасности.
+                </p>
+                <div class="page-tags">
+                  <span class="page-tag">Навык 7</span>
+                  <span class="page-tag">Навык 8</span>
+                </div>
+              </div>
+            </div>
+            <div class="page-back"></div>
+          </div>
+
+          <!-- СТРАНИЦА 4 -->
+          <div class="page" data-index="3">
+            <div class="page-front">
+              <div class="page-bg" data-bg="3"></div>
+              <div class="page-tint"></div>
+              <div class="page-content">
+                <p class="page-index">Страница 4 из 4</p>
+                <div class="page-company">
+                  <span class="page-company-bar"></span>
+                  <h3>Алиф Банк</h3>
+                </div>
+                <p class="page-role">Администратор / Специалист банковского обслуживания — 07.2025 – до сих пор</p>
+                <p class="page-body">
+                  Администрировал банковские системы АБС, CRM и Helpdesk TSM, обеспечивая устойчивую работу сервисов.
+                  Консультировал клиентов, оформлял кредиты и банковские карты Visa, Корти Милли и Mastercard. Проводил кассовые операции
+                  и оперативно устранял технические сбои мобильного приложения. Писал скрипты на Python для оптимизации и автоматизации внутренних
+                  процессов, успешно окончив Alif Academy с официальным рекомендательным письмом.
+                </p>
+                <div class="page-tags">
+                  <span class="page-tag">Работа с ABS</span>
+                  <span class="page-tag">Работа с CRM</span>
+                  <span class="page-tag">Helpdesk TSM</span>
+                  <span class="page-tag">Кассовые операции</span>
+                </div>
+              </div>
+            </div>
+            <div class="page-back"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="book-nav">
+          <button type="button" id="prevBtn" aria-label="Предыдущая страница">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="book-dots" id="bookDots"></div>
+          <button type="button" id="nextBtn" aria-label="Следующая страница">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ОБО МНЕ
+    ============================================================ -->
+    <section class="section" id="about">
+      <div class="container about-grid">
+        <div>
+          <h2>Обо мне</h2>
+        </div>
+        <div class="plate about-plate">
+          <p>
+            Я специалист с высшим образованием и разносторонним бэкграундом — от настройки промышленного оборудования до работы с финансовыми продуктами и IT-инфраструктурой.
+            В банковском секторе мой фокус направлен на два ключевых направления:
+            Качественный сервис и операции: уверенно работаю с кассовыми операциями, оформлением кредитных продуктов и банковских карт (Visa, Корти Милли, Mastercard), а также помогу клиентам решить любые технические вопросы с приложением.
+            Системная поддержка и автоматизация: глубоко понимаю внутренние банковские процессы (АБС, CRM, тикетинг TSM), умею проектировать backend-логику, работать с API и оптимизировать рабочие сценарии через автоматизацию.
+          </p>
+          <p style="margin-top: 1.2rem;">
+            Опытный специалист в сфере банковского администрирования с фокусом на цифровизации и оптимизации инфраструктуры. Мой приоритет — превращение сложных, повторяющихся операционных задач в отлаженные и автоносно работающие алгоритмы. Свободно применяю Python и PowerShell для написания скриптов любой сложности, а также использую платформу n8n для построения бесшовных интеграций и автоматизированных сценариев между сервисами. Сочетаю высокие стандарты ответственности банковского сектора с современными инженерными IT-практиками.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         НАВЫКИ
+    ============================================================ -->
+    <section class="section" id="skills">
+      <div class="container">
+        <div class="section-head">
+          <h2>Навыки</h2>
+          <p class="section-note">Основные инструменты и области.</p>
+        </div>
+        <div class="skills-wrap">
+          <div class="plate skill-plate">
+            <h4>IT, Разработка и Автоматизация</h4>
+            <p>
+              Python, PowerShell, PyCharm Professional.
+              Backend & Интеграции: Разработка Backend-логики, работа с REST API, построение сценариев автоматизации в n8n
+            </p>
+          </div>
+          <div class="plate skill-plate plate--violet">
+            <h4>Банковский сектор Alif Bank — Администратор / Специалист</h4>
+            <p>
+              Специализированный софт: АБС, CRM, Admin-панели, Helpdesk, TSM.
+              Продукты и Сервис: Кассовые операции, выпуск и обслуживание карт (Visa, Корти Милли, Mastercard), выдача микрокредитов, техническая поддержка пользователей приложения
+            </p>
+          </div>
+          <div class="plate skill-plate">
+            <h4>Asian Business Group</h4>
+            <p>Стажировка Младший помощник юриста, работа с документацией перевод её, ещё работа регламентами и бизнес-процессами. </p>
+            <p>
+            Составление Презинтаций, Таблиц, Документов (PowerPoint, Exel, Word, Outlook)
+            </p>
+          </div>
+          <div class="plate skill-plate plate--violet">
+            <h4>Выпускник Alif Academy </h4>
+            <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub).
+               Получил рекомендательное письмо об успешном окончании курсов.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ОБРАЗОВАНИЕ
+    ============================================================ -->
+    <section class="section" id="education">
+      <div class="container">
+        <div class="section-head">
+          <h2>Образование и сертификаты</h2>
+        </div>
+        <div class="edu-grid">
+          <div class="plate">
+            <h3>Выпускник Alif Academy</h3>
+            <p class="edu-period">06.2025 – 06.2026</p>
+            <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub).
+               Получил рекомендательное письмо об успешном окончании курсов.</p>
+          </div>
+          <div class="plate plate--violet">
+            <h3>Юридическое образование</h3>
+            <p class="edu-period">09.2015 – 07.2021</p>
+            <p>Российско-Таджикский (Славянский) университет</p>
+            <p>Факультет: Юридический (Бакалаврият, Магистратура)</p>
+            <p>Специальность: Юрист</p>
+            <p>Дата окончания: 2021 года</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         КОНТАКТЫ
+    ============================================================ -->
+    <section class="section" id="contact">
+      <div class="container contact-grid">
+        <div>
+          <h1>Связаться со мной</h1>
+        </div>
+        <div class="contact-list">
+          <a class="plate contact-row" href="Laststyle92@gmail.com">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
+            <span>
+              <span class="label" style="display:block;">Email</span>
+              <span class="value">Laststyle92@gmail.com</span>
+            </span>
+          </a>
+          <a class="plate contact-row plate--violet" href="@prototypear">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15.5c0 .4-.3.9-.7 1.1a17 17 0 0 1-3 1.2 15.8 15.8 0 0 1-11.1-11 17 17 0 0 1 1.2-3c.2-.4.7-.7 1.1-.7h2.4c.5 0 .9.3 1 .8l.7 3a1 1 0 0 1-.3 1L11 9.2a11.3 11.3 0 0 0 3.8 3.8l1.3-1.3a1 1 0 0 1 1-.3l3 .7c.5.1.8.5.8 1V15.5z"/></svg></span>
+            <span>
+              <span class="label" style="display:block;">Telegram</span>
+              <span class="value">@prototypear</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 Сайт создан и написан в ручную, права не защищены и открыты для плагиата, RR</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  const pageBackgrounds = [
+    "images/company1.png",
+    "images/company2.png",
+    "images/company3.png",
+    "images/company4.png"
+  ];
+
+  const pageFallbackColors = ["#E7B24C", "#8C7FEA", "#5FBF9F", "#E08A5B"];
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* КУРСОР */
+  (function initCursor() {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    document.body.classList.add("has-custom-cursor");
+
+    const canvas = document.getElementById("cursorCanvas");
+    const ctx = canvas.getContext("2d");
+    let cw, ch;
+    function resize() { cw = canvas.width = window.innerWidth; ch = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener("resize", resize);
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let isHovering = false;
+    let sparks = [];
+
+    window.addEventListener("mousemove", function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      sparks.push({ x: mouseX, y: mouseY, life: 1 });
+      if (sparks.length > 26) sparks.shift();
+    });
+
+    document.querySelectorAll("a, button, .plate, .page, .dot").forEach(function (el) {
+      el.addEventListener("mouseenter", function () { isHovering = true; });
+      el.addEventListener("mouseleave", function () { isHovering = false; });
+    });
+
+    function drawGlow(x, y, radius, alpha) {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      g.addColorStop(0, "rgba(255,255,255," + alpha + ")");
+      g.addColorStop(0.45, "rgba(255,255,255," + (alpha * 0.45).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, cw, ch);
+      for (let i = 0; i < sparks.length; i++) {
+        const s = sparks[i];
+        const r = (isHovering ? 13 : 8) * (0.35 + s.life * 0.65);
+        drawGlow(s.x, s.y, r, s.life * 0.5);
+        s.life -= prefersReducedMotion ? 1 : 0.05;
+      }
+      sparks = sparks.filter(function (s) { return s.life > 0; });
+      drawGlow(mouseX, mouseY, isHovering ? 15 : 9, 0.95);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* 3D TILT */
+  function attachTilt(el, intensity) {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    el.addEventListener("mousemove", function (e) {
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      el.style.transform = "perspective(800px) rotateX(" + (-py * intensity).toFixed(2) + "deg) rotateY(" + (px * intensity).toFixed(2) + "deg)";
+    });
+    el.addEventListener("mouseleave", function () { el.style.transform = ""; });
+  }
+  document.querySelectorAll(".plate").forEach(function (el) { attachTilt(el, 5); });
+
+  const bookEl = document.getElementById("book");
+  if (bookEl && window.matchMedia("(pointer: fine)").matches) {
+    const baseTransform = "rotateX(5deg) rotateY(-6deg)";
+    document.querySelector(".book-stage").addEventListener("mousemove", function (e) {
+      const rect = bookEl.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      bookEl.style.transform = "rotateX(" + (5 - py * 8).toFixed(2) + "deg) rotateY(" + (-6 + px * 10).toFixed(2) + "deg)";
+    });
+    document.querySelector(".book-stage").addEventListener("mouseleave", function () {
+      bookEl.style.transform = baseTransform;
+    });
+  }
+
+  /* ФОНОВЫЕ ЧАСТИЦЫ */
+  (function initBackground() {
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let w, h, particles = [];
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    const count = Math.max(24, Math.min(70, Math.floor((window.innerWidth * window.innerHeight) / 22000)));
+    const hues = ["255,255,255", "255,255,255", "214,226,255"];
+
+    function makeParticle() {
+      const depth = Math.random();
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        depth: depth,
+        r: 0.6 + depth * 2.2,
+        vx: (Math.random() - 0.5) * (0.04 + depth * 0.12),
+        vy: (Math.random() - 0.5) * (0.04 + depth * 0.12),
+        hue: hues[Math.floor(Math.random() * hues.length)]
+      };
+    }
+    for (let i = 0; i < count; i++) particles.push(makeParticle());
+
+    let parX = 0, parY = 0, targetX = 0, targetY = 0;
+    window.addEventListener("mousemove", function (e) {
+      targetX = (e.clientX / window.innerWidth) - 0.5;
+      targetY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      parX += (targetX - parX) * 0.02;
+      parY += (targetY - parY) * 0.02;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10;
+        if (p.y > h + 10) p.y = -10;
+        const ox = parX * 26 * p.depth;
+        const oy = parY * 26 * p.depth;
+        const alpha = (0.12 + p.depth * 0.32).toFixed(2);
+        const glow = ctx.createRadialGradient(p.x + ox, p.y + oy, 0, p.x + ox, p.y + oy, p.r * 5);
+        glow.addColorStop(0, "rgba(" + p.hue + "," + alpha + ")");
+        glow.addColorStop(1, "rgba(" + p.hue + ",0)");
+        ctx.beginPath();
+        ctx.arc(p.x + ox, p.y + oy, p.r * 5, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    if (!prefersReducedMotion) tick();
+  })();
+
+  /* КНИГА */
+  (function initBook() {
+    const pages = Array.prototype.slice.call(document.querySelectorAll(".page"));
+    const total = pages.length;
+    const bookSection = document.querySelector(".book-section");
+    const dotsWrap = document.getElementById("bookDots");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    let current = 0;
+    const pageColors = pageFallbackColors.slice();
+
+    for (let i = 0; i < total; i++) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "dot";
+      b.setAttribute("aria-label", "Перейти к странице " + (i + 1));
+      b.addEventListener("click", function () { goTo(i); });
+      dotsWrap.appendChild(b);
+    }
+    const dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function applyColor(index, color) {
+      pageColors[index] = color;
+      if (index === current) {
+        bookSection.style.setProperty("--page-accent", color);
+      }
+    }
+
+    function extractColor(index) {
+      const url = pageBackgrounds[index];
+      if (!url) { applyColor(index, pageFallbackColors[index]); return; }
+
+      const img = new Image();
+      img.onload = function () {
+        try {
+          const size = 24;
+          const c = document.createElement("canvas");
+          c.width = size; c.height = size;
+          const cctx = c.getContext("2d");
+          cctx.drawImage(img, 0, 0, size, size);
+          const data = cctx.getImageData(0, 0, size, size).data;
+          let r = 0, g = 0, b = 0, n = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i + 3] < 200) continue;
+            r += data[i]; g += data[i + 1]; b += data[i + 2];
+            n++;
+          }
+          if (!n) throw new Error("no opaque pixels");
+          r = Math.round(r / n); g = Math.round(g / n); b = Math.round(b / n);
+          applyColor(index, "rgb(" + r + "," + g + "," + b + ")");
+        } catch (err) {
+          applyColor(index, pageFallbackColors[index]);
+        }
+      };
+      img.onerror = function () { applyColor(index, pageFallbackColors[index]); };
+      img.src = url;
+    }
+
+    for (let i = 0; i < total; i++) extractColor(i);
+
+    function render() {
+      pages.forEach(function (el, i) {
+        el.classList.toggle("flipped", i < current);
+        el.style.zIndex = i < current ? i : (total - i);
+      });
+      dots.forEach(function (d, i) { d.classList.toggle("active", i === current); });
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
+      bookSection.style.setProperty("--page-accent", pageColors[current]);
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(total - 1, index));
+      render();
+    }
+
+    prevBtn.addEventListener("click", function () { goTo(current - 1); });
+    nextBtn.addEventListener("click", function () { goTo(current + 1); });
+
+    document.querySelector(".book-section").addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") goTo(current + 1);
+      if (e.key === "ArrowLeft") goTo(current - 1);
+    });
+    render();
+  })();
+
+})();
+</script>
+</body>
+</html>
