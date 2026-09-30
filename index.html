@@ -814,18 +814,18 @@
     .page, .book-shift, .book { transition-duration: .01s !important; }
     .status-pulse { animation: none; }
   }
-  /* --- Оптимизация книги только для телефонов --- */
-
+  /* Адаптация для большого объема текста на мобильных в портретном режиме */
   @media (max-width: 768px) and (orientation: portrait) {
-    .book-page, .page, .page-front, .page-back, .page-element {
-      box-shadow: none !important;       /* Убираем тяжелые тени, перегружающие память телефона */
-      text-shadow: none !important;
-      backdrop-filter: none !important;  /* Отключаем тяжелые размытия подложки */
+    .page, .page-front, .page-back, .book-page {
+      font-size: 14px !important;       /* Уменьшаем размер текста для компактности */
+      line-height: 1.4 !important;      /* Оптимизируем межстрочный интервал */
+      padding: 12px !important;         /* Уменьшаем внутренние отступы страниц */
     }
-    
-    /* Упрощаем отрисовку текста для мобильного процессора */
-    .book-container {
-      -webkit-font-smoothing: antialiased;
+
+    /* Включаем прокрутку внутри страницы книги, если текст всё равно не влезает */
+    .page-front, .page-back {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
     }
   }
   /* Адаптация размеров книги под телефон */
@@ -1403,8 +1403,15 @@
     const pages    = Array.prototype.slice.call(document.querySelectorAll(".page"));
     const total    = pages.length;
 
-    const SPREAD = { pw: 720, ph: 900, maxScale: 1.8 };
-    const SINGLE = { pw: 720, ph: 900, maxScale: 2.0  };
+    // Определяем, мобильное ли устройство
+    const isMobile = window.innerWidth <= 768;
+
+    // На телефоне уменьшаем ширину под размер экрана, а высоту считаем пропорционально
+    const mobileWidth = isMobile ? Math.min(window.innerWidth - 32, 400) : 720;
+    const mobileHeight = isMobile ? Math.round(mobileWidth * 1.25) : 900;
+
+    const SPREAD = { pw: mobileWidth, ph: mobileHeight, maxScale: 1.8 };
+    const SINGLE = { pw: mobileWidth, ph: mobileHeight, maxScale: 2.0 };
     const SPREAD_MIN_WIDTH = 880;
 
     let current = 0;
