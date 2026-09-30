@@ -828,6 +828,13 @@
       -webkit-font-smoothing: antialiased;
     }
   }
+  /* Адаптация размеров книги под телефон */
+  @media (max-width: 768px) and (orientation: portrait) {
+    :root {
+      --pw: 90vw !important; /* Уменьшаем ширину */
+      --hw: 65vh !important; /* Уменьшаем высоту */
+    }
+  }
 </style>
 </head>
 <body>
