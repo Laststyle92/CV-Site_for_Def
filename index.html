@@ -817,7 +817,7 @@
   /* Адаптация для большого объема текста на мобильных в портретном режиме */
   @media (max-width: 768px) and (orientation: portrait) {
     .page, .page-front, .page-back, .book-page {
-      font-size: 14px !important;       /* Уменьшаем размер текста для компактности */
+      font-size: 8px !important;       /* Уменьшаем размер текста для компактности */
       line-height: 1.4 !important;      /* Оптимизируем межстрочный интервал */
       padding: 12px !important;         /* Уменьшаем внутренние отступы страниц */
     }
@@ -835,6 +835,12 @@
       --hw: 65vh !important; /* Уменьшаем высоту */
     }
   }
+
+  @media (max-width: 768px) {
+  .page-tag:nth-child(n+4) {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -1409,13 +1415,13 @@
 let pageText = "Ваш текст книги...";
 
 if (isMobile) {
-  // Оставляем 50% символов текста
-  const length50Percent = Math.floor(pageText.length * 0.5);
-  pageText = pageText.substring(0, length50Percent) + '...';
+  // Оставляем 70% символов текста
+  const length70Percent = Math.floor(pageText.length * 0.7);
+  pageText = pageText.substring(0, length70Percent) + '...';
 }
     // На телефоне уменьшаем ширину под размер экрана, а высоту считаем пропорционально
     const mobileWidth = isMobile ? Math.min(window.innerWidth - 32, 400) : 720;
-    const mobileHeight = isMobile ? Math.round(mobileWidth * 1.25) : 900;
+    const mobileHeight = isMobile ? Math.round(mobileWidth * 1.5) : 900;
 
     const SPREAD = { pw: mobileWidth, ph: mobileHeight, maxScale: 1.8 };
     const SINGLE = { pw: mobileWidth, ph: mobileHeight, maxScale: 2.0 };
