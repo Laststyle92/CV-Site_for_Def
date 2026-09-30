@@ -3,110 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#08090a">
 <title>Резюме — Альминов Руслан Константинович</title>
-<meta name="description" content="Резюме и портфолио — Имя Фамилия, ваша профессия">
+<meta name="description" content="Резюме и портфолио — Альминов Руслан Константинович">
 
 <!--
 ================================================================================
   КАК УСТРОЕН ЭТОТ ФАЙЛ (читайте перед редактированием)
 ================================================================================
-  1. <style>  — все стили сайта: цвета, шрифты, 3D-книга, "плашки", анимации.
-  2. <body>   — сама разметка, сверху вниз:
-       - курсор (cursorCanvas, падающая звезда со шлейфом) — не трогайте, это декор
-       - шапка (hero) — имя, профессия, короткое вступление, фотография
-       - секция "Опыт работы" — 3D-книга на 4 страницы
+  Дизайн — по DESIGN.md (Linear: «midnight precision instrument»).
+  Все цвета, шрифты, радиусы и отступы лежат в :root (дизайн-токены).
+
+  1. <style> — стили: токены, курсор, частицы, навигация, hero, 3D-книга, контакты.
+  2. <body> — разметка:
+       - холсты курсора (#cursorCanvas) и частиц (#bgCanvas)
+       - боковые панели статистики
+       - верхняя навигация
+       - шапка (hero) + полоса инструментов
+       - секция "Опыт работы" (3D-книга)
        - секция "Обо мне"
        - секция "Навыки"
        - секция "Образование и сертификаты"
-       - секция "Контакты"
+       - секция "Контакты" (Email, Telegram, GitHub, Локация)
        - подвал
-  3. <script> — вся логика: курсор, фон, листание книги, цвет страниц.
+  3. <script> — логика: курсор, частицы фона, книга, подсветка меню, боковые панели.
 ================================================================================
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,480;0,9..144,600;1,9..144,480&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
   /* ============================================================
-     1. СБРОС И БАЗА
+     1. ДИЗАЙН-ТОКЕНЫ
+  ============================================================ */
+  :root {
+    --void: #08090a;
+    --carbon: #0f1011;
+    --obsidian: #161718;
+    --graphite: #23252a;
+    --smoke: #383b3f;
+    --ash: #62666d;
+    --fog: #8a8f98;
+    --mist: #d0d6e0;
+    --bone: #e5e5e6;
+    --paper: #ffffff;
+    --lime: #e4f222;
+    --green: #27a644;
+    --coral: #eb5757;
+    --teal: #02b8cc;
+    --iris: #6366f1;
+    --lavender: #8b5cf6;
+
+    --font-ui: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Berkeley Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --r-card: 12px;
+    --r-btn: 6px;
+    --r-badge: 4px;
+    --r-pill: 9999px;
+
+    --hairline: inset 0 0 0 1px var(--graphite);
+    --container: 1200px;
+    --gutter: clamp(20px, 4vw, 48px);
+    --section-gap: clamp(64px, 9vw, 96px);
+    --ease: cubic-bezier(.5, .05, .15, 1);
+  }
+
+  /* ============================================================
+     2. БАЗА И ХОЛСТЫ
   ============================================================ */
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: var(--bg-0);
-    color: var(--text-0);
-    font-family: var(--font-body);
+    background: var(--void);
+    color: var(--mist);
+    font-family: var(--font-ui);
+    font-feature-settings: "cv01" on, "ss03" on, "zero" on;
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.5;
+    font-weight: 400;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   img { max-width: 100%; display: block; }
-  a { color: inherit; }
-  button { font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; color: inherit; }
+  h1, h2, h3, h4, p, ul { margin: 0; }
+  ul { padding: 0; list-style: none; }
+  h1, h2, h3, h4 { color: var(--paper); font-weight: 510; }
 
-  /* ============================================================
-     2. ЦВЕТОВАЯ СХЕМА И ТИПОГРАФИКА (дизайн-токены)
-  ============================================================ */
-  :root {
-    --bg-0: #8B0000;
-    --bg-1: #000000;
-    --surface: rgba(255,255,255,0.045);
-    --surface-strong: rgba(255,255,255,0.07);
-    --surface-border: rgba(255,255,255,0.10);
+  ::selection { background: var(--lime); color: var(--void); }
+  :focus-visible { outline: 2px solid var(--mist); outline-offset: 3px; border-radius: var(--r-btn); }
 
-    --text-0: #F3EFE4;
-    --text-1: #B6BECC;
-    --text-2: #6C7688;
-
-    --gold: #E7B24C;
-    --gold-soft: #F2CE84;
-    --violet: #8C7FEA;
-    --violet-soft: #B4ACFF;
-    --sage: #0b285e;
-    --clay: #02481e;
-
-    --paper-0: #F4EEDD;
-    --paper-1: #E8DCBF;
-    --ink: #24201A;
-
-    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-    --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-
-    --page-accent: var(--gold);
-    --container: 1180px;
-  }
-
-  @property --page-accent {
-    syntax: '<color>';
-    inherits: true;
-    initial-value: #E7B24C;
-  }
-
-  h1, h2, h3 { font-family: var(--font-display); font-weight: 500; margin: 0; color: var(--text-0); }
-  p { margin: 0; }
-
-  .container {
-    width: 100%;
-    max-width: var(--container);
-    margin-inline: auto;
-    padding-inline: clamp(1.25rem, 4vw, 3rem);
-  }
-
-  ::selection { background: var(--gold); color: #1a1206; }
-
-  :focus-visible {
-    outline: 2px solid var(--gold-soft);
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
-
-  /* ============================================================
-     3. КУРСОР — падающая звезда со шлейфом
-  ============================================================ */
+  /* Холст курсора */
   #cursorCanvas {
     position: fixed;
     inset: 0;
@@ -118,276 +112,383 @@
   body.has-custom-cursor #cursorCanvas { opacity: 1; }
   @media (pointer: fine) {
     body.has-custom-cursor, body.has-custom-cursor a, body.has-custom-cursor button,
-    body.has-custom-cursor .plate, body.has-custom-cursor .page, body.has-custom-cursor .dot {
+    body.has-custom-cursor .card, body.has-custom-cursor .page, body.has-custom-cursor .dot,
+    body.has-custom-cursor .nbtn {
       cursor: none;
     }
   }
 
-  /* ============================================================
-     4. ФОНОВЫЕ 3D-АНИМАЦИИ
-  ============================================================ */
-  .starfield {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-color: #000;
-    background-image:
-      radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-      radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-      radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
-      radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
-    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
-    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
-  }
+  /* Холст фоновых частиц */
   #bgCanvas {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
   }
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(90px);
-    z-index: 0;
-    pointer-events: none;
-    opacity: .18;
-  }
-  .orb-1 {
-    width: 46vw; height: 46vw;
-    background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 70%);
-    top: -12vw; left: -10vw;
-    animation: float-a 26s ease-in-out infinite;
-  }
-  .orb-2 {
-    width: 40vw; height: 40vw;
-    background: radial-gradient(circle, rgba(255,255,255,0.45), transparent 70%);
-    bottom: -14vw; right: -8vw;
-    animation: float-b 32s ease-in-out infinite;
-  }
-  @keyframes float-a {
-    0%, 100% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(3vw, 4vw) scale(1.08); }
-  }
-  @keyframes float-b {
-    0%, 100% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(-4vw, -3vw) scale(1.1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .orb-1, .orb-2 { animation: none; }
-  }
 
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
   main, header, footer { position: relative; z-index: 1; }
 
-  /* ============================================================
-     5. ШАПКА / HERO И ВЕРХНЯЯ ПАНЕЛЬ
-  ============================================================ */
-  .topbar {
-    position: fixed;
-    inset: 0 0 auto 0;
-    z-index: 50;
-    min-height: 72px;
-    padding: .8rem clamp(1.25rem, 4vw, 3rem);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    background: rgba(0, 0, 0, .82);
-    border-bottom: 1px solid rgba(255,255,255,.10);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+  .h-section {
+    font-size: clamp(32px, 4.4vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.022em;
+    font-weight: 510;
   }
+  .section { padding-top: var(--section-gap); scroll-margin-top: 56px; }
 
-  .brandmark {
-    position: static;
-    z-index: auto;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    letter-spacing: .01em;
-    color: var(--text-0);
-    text-decoration: none;
-    mix-blend-mode: normal;
-    min-width: 0;
-  }
-  .brandmark span { color: var(--gold-soft); }
-
-  .quick-contact {
-    position: static;
-    z-index: auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    padding: .6rem 1.2rem;
-    min-width: 118px;
-    border-radius: 8px;
-    background: var(--surface-strong);
-    border: 1px solid var(--surface-border);
-    color: var(--text-0);
-    font-size: .875rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: border-color .3s ease, transform .3s ease, background .3s ease;
-    flex-shrink: 0;
-  }
-  .quick-contact:hover {
-    border-color: var(--gold-soft);
-    background: rgba(255,255,255,.10);
-    transform: translateY(-1px);
-  }
-
-  .hero {
-    padding: clamp(9rem, 15vw, 11rem) 0 clamp(3rem, 6vw, 5rem);
-  }
-  .hero-eyebrow-role {
-    font-size: .95rem;
-    color: var(--violet-soft);
-    font-weight: 600;
-    margin-bottom: .9rem;
-  }
-  .hero h1 {
-    font-size: clamp(2.6rem, 6vw, 4.5rem);
-    line-height: 1.05;
-    max-width: 16ch;
-    font-weight: 480;
-  }
-  .hero-intro {
-    margin-top: 1.5rem;
-    max-width: 56ch;
-    font-size: 1.1rem;
-    color: var(--text-1);
-  }
-  .hero-scrollcue {
-    margin-top: 3.25rem;
-    display: inline-flex;
-    align-items: center;
-    gap: .6rem;
-    color: var(--text-2);
-    font-size: .875rem;
-    text-decoration: none;
-  }
-  .hero-scrollcue svg { width: 14px; height: 14px; animation: bob 2.2s ease-in-out infinite; }
-  @keyframes bob { 0%,100% { transform: translateY(0);} 50% { transform: translateY(5px);} }
-  @media (prefers-reduced-motion: reduce) { .hero-scrollcue svg { animation: none; } }
-
-  /* Двухколоночная сетка для шапки с фото справа */
-  .hero-grid {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 3rem;
-  }
-
-  .hero-text {
-    flex: 1;
-  }
-
-  .hero-avatar {
-    flex-shrink: 0;
-  }
-
-  .hero-avatar img {
-    width: 320px !important;
-    height: 400px !important;
-    object-fit: cover;
-    border-radius: 16px;
-    border: 2px solid var(--gold);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-  }
-
-  @media (max-width: 850px) {
-    .hero-grid {
-      flex-direction: column-reverse;
-      text-align: center;
-      gap: 2rem;
-    }
-    .hero-text h1, .hero-intro {
-      margin-inline: auto;
-    }
-    .hero-avatar img {
-      width: 240px !important;
-      height: 300px !important;
-    }
-  }
-
-  /* ============================================================
-     6. ОБЩИЕ ЭЛЕМЕНТЫ СЕКЦИЙ
-  ============================================================ */
-  .section { padding: clamp(3.5rem, 7vw, 6rem) 0; }
   .section-head {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 2rem;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
+    gap: 24px 48px;
     flex-wrap: wrap;
-  }
-  .section-head h2 {
-    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    margin-bottom: clamp(28px, 4vw, 48px);
   }
   .section-note {
-    color: var(--text-2);
-    font-size: .95rem;
+    color: var(--fog);
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    max-width: 38ch;
+  }
+
+  /* Карточки и кнопки */
+  .card {
+    background: var(--carbon);
+    border-radius: var(--r-card);
+    box-shadow: var(--hairline);
+    padding: 24px;
+    transition: box-shadow .25s ease;
+  }
+  .card:hover { box-shadow: inset 0 0 0 1px var(--smoke); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--r-btn);
+    font-size: 14px;
+    font-weight: 510;
+    letter-spacing: -0.011em;
+    cursor: pointer;
+    border: 0;
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .btn-primary {
+    background: var(--lime);
+    color: var(--void);
+    padding: 10px 16px;
+    box-shadow: rgba(0,0,0,.01) 0 5px 2px, rgba(0,0,0,.04) 0 3px 2px, rgba(0,0,0,.07) 0 1px 1px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); background: #ecf84a; }
+  .btn-primary svg { width: 14px; height: 14px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255,255,255,.05);
+    color: var(--fog);
+    border-radius: var(--r-badge);
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.05);
+    color: var(--mist);
+    border-radius: var(--r-pill);
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+  .mono { font-family: var(--font-mono); letter-spacing: -0.013em; }
+
+  /* ============================================================
+     3. НАВИГАЦИЯ
+  ============================================================ */
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    height: 56px;
+    background: rgba(8, 9, 10, .72);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 1px 0 var(--graphite);
+  }
+  .nav-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brandmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 510;
+    letter-spacing: -0.011em;
+    color: var(--paper);
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .brandmark svg { width: 18px; height: 18px; flex: none; }
+  .brandmark span { color: var(--paper); }
+  .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; margin-right: 16px; }
+  .nav-links a {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--mist);
+    border-radius: var(--r-btn);
+    transition: color .2s ease, background .2s ease;
+  }
+  .nav-links a:hover { color: var(--paper); background: rgba(255,255,255,.05); }
+  .nav-links a.active { color: var(--paper); box-shadow: inset 0 -1px 0 var(--paper); border-radius: 0; }
+  .nav-cta {
+    flex: none;
+    background: var(--paper);
+    color: var(--void);
+    padding: 8px 16px;
+    border-radius: var(--r-pill);
+    font-size: 13px;
+    font-weight: 510;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .nav-cta:hover { background: var(--bone); transform: translateY(-1px); }
+  @media (max-width: 900px) { .nav-links { display: none; } }
+
+  /* ============================================================
+     4. HERO И ПОЛОСА ИНСТРУМЕНТОВ
+  ============================================================ */
+  .hero {
+    position: relative;
+    padding: clamp(112px, 14vw, 152px) 0 clamp(56px, 7vw, 88px);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -38%;
+    width: min(1400px, 140vw);
+    height: 70%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(208,214,224,.14), transparent 68%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+  .hero-eyebrow-role { margin-bottom: 24px; }
+  .hero h1 {
+    font-size: clamp(44px, 7.2vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.022em;
+    max-width: 11ch;
+  }
+  .hero-lead {
+    margin-top: 28px;
+    font-size: clamp(17px, 2vw, 20px);
+    line-height: 1.33;
+    letter-spacing: -0.012em;
+    font-weight: 510;
+    color: var(--paper);
     max-width: 34ch;
+  }
+  .hero-intro {
+    margin-top: 16px;
+    max-width: 60ch;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--fog);
+  }
+  .hero-actions { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+
+  .photo-frame {
+    position: relative;
+    background: var(--carbon);
+    border-radius: var(--r-card);
+    box-shadow: var(--hairline), rgba(8,9,10,.6) 0 4px 32px;
+    padding: 12px;
+    max-width: 360px;
+    justify-self: end;
+    width: 100%;
+  }
+  .photo-bar { display: flex; gap: 6px; padding: 2px 4px 12px; }
+  .photo-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--graphite); }
+  .photo-screen {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--r-btn);
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--obsidian), var(--carbon));
+    box-shadow: var(--hairline);
+  }
+  .photo-screen img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-mono {
+    position: absolute; inset: 0;
+    display: none;
+    place-items: center;
+    font-size: 72px;
+    letter-spacing: -0.022em;
+    font-weight: 510;
+    color: var(--smoke);
+  }
+  .photo-screen.no-photo img { display: none; }
+  .photo-screen.no-photo .photo-mono { display: grid; }
+
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .photo-frame { justify-self: start; max-width: 280px; order: -1; }
+    .hero h1 { max-width: none; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-text > *, .photo-frame { animation: rise .8s var(--ease) both; }
+    .hero-text > *:nth-child(2) { animation-delay: .06s; }
+    .hero-text > *:nth-child(3) { animation-delay: .12s; }
+    .hero-text > *:nth-child(4) { animation-delay: .18s; }
+    .hero-text > *:nth-child(5) { animation-delay: .24s; }
+    .photo-frame { animation-delay: .15s; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .tools {
+    position: relative;
+    z-index: 2;
+    background: var(--void);
+    padding: 28px 0;
+    box-shadow: 0 -1px 0 var(--graphite), 0 1px 0 var(--graphite);
+  }
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 14px 40px;
+    color: var(--fog);
+    font-size: 15px;
+    font-weight: 510;
+    letter-spacing: -0.011em;
   }
 
   /* ============================================================
-     7. КНИГА ОПЫТА (3D flipbook)
+     5. КНИГА ОПЫТА (3D flipbook С РАЗМЫТЫМИ ФОТО)
   ============================================================ */
-  .book-section { --page-accent: var(--gold); }
-
-  .book-stage {
-    perspective: 2600px;
-    display: flex;
-    justify-content: center;
-    padding: 1rem 0 2.5rem;
-  }
-  .book {
+  .showcase {
     position: relative;
-    width: min(92vw, 640px);
-    height: clamp(420px, 58vw, 540px);
-    transform-style: preserve-3d;
-    transform: rotateX(5deg) rotateY(-6deg);
-    transition: transform .5s ease;
+    background: var(--carbon);
+    border-radius: var(--r-card);
+    box-shadow: var(--hairline);
+    padding: clamp(20px, 4vw, 48px) clamp(8px, 2vw, 24px) 20px;
+    overflow: hidden;
   }
-  .book::after {
+  .showcase::before {
     content: "";
     position: absolute;
-    left: 6%; right: 6%; bottom: -34px;
-    height: 60px;
-    background: radial-gradient(ellipse at center, color-mix(in srgb, var(--page-accent) 45%, transparent), transparent 72%);
-    filter: blur(18px);
-    z-index: -1;
-    transition: background .6s ease;
+    inset: auto 0 0 0;
+    height: 65%;
+    background: radial-gradient(ellipse 60% 100% at 50% 100%, rgba(208,214,224,.10), transparent 70%);
+    pointer-events: none;
   }
+  .book-viewport {
+    position: relative;
+    width: 100%;
+    touch-action: pan-y;
+  }
+  .book-scale {
+    position: absolute;
+    top: 0; left: 50%;
+    transform-origin: 50% 0;
+    transform: translateX(-50%) scale(var(--s, 1));
+  }
+  .book-shift {
+    position: absolute;
+    inset: 0;
+    perspective: 2600px;
+    perspective-origin: 50% 35%;
+    transition: transform .9s var(--ease);
+  }
+  .book {
+    position: absolute;
+    top: 0;
+    left: var(--hinge, 0px);
+    width: var(--pw);
+    height: var(--ph);
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 4deg)) rotateY(var(--ry, 0deg));
+    transition: transform .35s ease-out;
+  }
+
+  .stack {
+    position: absolute;
+    top: 6px; bottom: -6px;
+    width: 100%;
+    background: var(--obsidian);
+    box-shadow: var(--hairline), 0 24px 48px -12px rgba(0,0,0,.7);
+    transform: translateZ(-6px);
+    transition: opacity .5s ease;
+  }
+  .stack-r { left: 6px; border-radius: 4px 12px 12px 4px; }
+  .stack-l { left: -100%; margin-left: -6px; border-radius: 12px 4px 4px 12px; opacity: 0; }
+  .book-scale.spread.has-left .stack-l { opacity: 1; }
+  .book-scale.at-end .stack-r { opacity: 0; }
+
   .page {
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
     transform-origin: left center;
-    transform: rotateY(0deg);
-    transition: transform .95s cubic-bezier(.5,.05,.15,1);
+    transition: transform .95s var(--ease), opacity .5s ease .25s;
   }
-  .page.flipped { transform: rotateY(-172deg); }
+  .book-scale.single .page.flipped { opacity: 0; pointer-events: none; }
 
   .page-front, .page-back {
     position: absolute;
     inset: 0;
-    border-radius: 16px;
+    border-radius: 4px 12px 12px 4px;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     overflow: hidden;
+    background: linear-gradient(180deg, #131415 0%, var(--carbon) 100%);
+    box-shadow: var(--hairline);
   }
+  .page-front::after, .page-back::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 12%;
+    background: linear-gradient(90deg, rgba(0,0,0,.55), transparent);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .page-back { transform: rotateY(180deg); background: linear-gradient(180deg, var(--obsidian), var(--carbon)); }
 
+  /* Размытое фото на фоне страниц книги */
   .page-bg {
     position: absolute;
     inset: -18px;
     background-size: cover;
     background-position: center;
-    filter: blur(3px) saturate(1.15);
+    filter: blur(1px) saturate(1.15);
     transform: scale(1.08);
+    opacity: 0.25;
     z-index: 0;
+    pointer-events: none;
   }
   .page-bg[data-bg="0"] { background-image: url("images/company1.png"); }
   .page-bg[data-bg="1"] { background-image: url("images/company2.png"); }
@@ -398,500 +499,648 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background:
-      linear-gradient(155deg, color-mix(in srgb, var(--page-accent) 28%, transparent) 0%, rgba(10,13,20,0.58) 72%);
+    background: linear-gradient(155deg, color-mix(in srgb, var(--accent, var(--iris)) 18%, transparent) 0%, rgba(15,16,17,0.78) 100%);
+    pointer-events: none;
   }
-  .page-front {
-    border: 1px solid color-mix(in srgb, var(--page-accent) 45%, var(--surface-border) 55%);
-    box-shadow: 0 40px 70px -30px color-mix(in srgb, var(--page-accent) 55%, transparent);
-    transition: border-color .6s ease, box-shadow .6s ease;
-  }
+
   .page-content {
     position: relative;
     z-index: 2;
     height: 100%;
-    padding: clamp(1.6rem, 4vw, 2.75rem);
+    padding: 34px 34px 30px 40px;
     display: flex;
     flex-direction: column;
   }
+  .page-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .page-index {
-    font-size: .8rem;
-    color: var(--text-2);
-    margin-bottom: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: -0.013em;
+    color: var(--fog);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px 2px 6px;
+    background: rgba(255,255,255,.05);
+    border-radius: var(--r-badge);
   }
-  .page-company {
-    display: flex;
-    align-items: baseline;
-    gap: .7rem;
-    margin-top: 1rem;
+  .page-index::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
-  .page-company-bar {
-    width: 3px;
-    height: 1.4em;
-    background: var(--page-accent);
-    border-radius: 2px;
-    transition: background .6s ease;
-  }
+  .page-company { margin-top: 26px; }
   .page-content h3 {
-    font-size: clamp(1.35rem, 3vw, 1.85rem);
-    color: var(--text-0);
-    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.13;
+    letter-spacing: -0.012em;
+    font-weight: 510;
   }
   .page-role {
-    margin-top: .35rem;
-    color: var(--text-1);
-    font-size: .95rem;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--fog);
   }
   .page-body {
-    margin-top: 1.1rem;
-    color: var(--text-1);
-    font-size: .95rem;
-    line-height: 1.65;
-    max-width: 54ch;
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    letter-spacing: -0.006em;
+    color: var(--mist);
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--graphite) transparent;
+  }
+  .page-body p + p { margin-top: 8px; }
+  .page-body .lbl { color: var(--paper); font-weight: 510; }
+  .page-body ul { margin-top: 8px; display: grid; gap: 4px; }
+  .page-body li { position: relative; padding-left: 14px; }
+  .page-body li::before {
+    content: "";
+    position: absolute; left: 0; top: .72em;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent);
   }
   .page-tags {
     margin-top: auto;
-    padding-top: 1.25rem;
+    padding-top: 16px;
     display: flex;
     flex-wrap: wrap;
-    gap: .5rem;
+    gap: 8px;
   }
   .page-tag {
-    font-size: .78rem;
-    color: var(--text-0);
-    padding: .3rem .7rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--page-accent) 20%, rgba(255,255,255,0.06));
-    border: 1px solid color-mix(in srgb, var(--page-accent) 35%, var(--surface-border));
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--bone);
+    padding: 3px 10px;
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent);
   }
 
-  .page-back {
-    background:
-      repeating-linear-gradient(180deg, rgba(36,32,26,0.05) 0px, rgba(36,32,26,0.05) 1px, transparent 1px, transparent 25px),
-      linear-gradient(160deg, var(--paper-0), var(--paper-1));
-    transform: rotateY(180deg);
-    box-shadow: inset 0 0 60px rgba(36,32,26,0.18);
+  .back-content {
+    position: relative; z-index: 2; height: 100%;
+    padding: 34px 40px 30px 34px;
+    display: flex; flex-direction: column; justify-content: space-between;
   }
+  .back-num {
+    font-family: var(--font-mono);
+    font-size: 120px;
+    line-height: .9;
+    letter-spacing: -0.04em;
+    color: var(--graphite);
+  }
+  .back-title { font-size: 20px; line-height: 1.25; letter-spacing: -0.012em; color: var(--fog); max-width: 18ch; }
+  .back-bar { width: 40px; height: 2px; background: var(--accent); border-radius: 2px; margin-bottom: 14px; }
 
   .book-nav {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.4rem;
+    gap: 16px;
+    margin-top: 28px;
   }
-  .book-nav button {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    color: var(--text-0);
+  .book-nav .nbtn {
+    width: 40px; height: 40px;
+    border-radius: var(--r-btn);
+    border: 0;
+    background: transparent;
+    box-shadow: var(--hairline);
     display: grid;
     place-items: center;
-    transition: border-color .3s ease, background .3s ease, opacity .3s ease, transform .2s ease;
+    cursor: pointer;
+    color: var(--mist);
+    transition: background .2s ease, opacity .2s ease, box-shadow .2s ease;
   }
-  .book-nav button:hover:not(:disabled) { border-color: var(--page-accent); transform: translateY(-1px); }
-  .book-nav button:disabled { opacity: .3; }
-  .book-nav button svg { width: 16px; height: 16px; }
-
-  .book-dots { display: flex; gap: .55rem; }
+  .book-nav .nbtn:hover:not(:disabled) { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px var(--smoke); }
+  .book-nav .nbtn:disabled { opacity: .3; cursor: default; }
+  .book-nav svg { width: 16px; height: 16px; }
+  .book-dots { display: flex; align-items: center; gap: 8px; }
   .dot {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    border: none;
-    background: var(--surface-strong);
-    padding: 0;
-    transition: background .4s ease, transform .3s ease;
+    width: 6px; height: 6px;
+    border-radius: var(--r-pill);
+    border: 0; padding: 0;
+    background: var(--smoke);
+    cursor: pointer;
+    transition: width .35s var(--ease), background .3s ease;
   }
-  .dot.active { background: var(--page-accent); transform: scale(1.3); }
-
-  @media (max-width: 640px) {
-    .topbar { min-height: 62px; padding: .7rem 1rem; }
-    .brandmark { font-size: .95rem; }
-    .quick-contact { min-width: 96px; padding: .5rem .85rem; font-size: .82rem; }
-    .hero { padding-top: 7.8rem; }
-    .book { transform: rotateX(3deg) rotateY(-3deg); }
-    .page-body { -webkit-line-clamp: unset; }
-  }
+  .dot.active { width: 24px; background: var(--paper); }
+  .book-count { font-size: 12px; color: var(--fog); min-width: 44px; text-align: center; }
 
   /* ============================================================
-     8. ПЛАШКИ
-  ============================================================ */
-  .plate {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--surface-border);
-    border-left: 3px solid var(--gold);
-    border-radius: 10px;
-    padding: 1.5rem 1.65rem;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    will-change: transform;
-  }
-  .plate--violet { border-left-color: var(--violet); }
-  .plate h3, .plate h4 {
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--text-0);
-  }
-  .plate p { color: var(--text-1); font-size: .93rem; margin-top: .5rem; }
-
-  /* ============================================================
-     9. ОБО МНЕ
+     6. ОБО МНЕ
   ============================================================ */
   .about-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.8fr); /* Расширяем правую колонку */
-    gap: clamp(2rem, 5vw, 4rem);
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr);
+    gap: clamp(28px, 6vw, 80px);
     align-items: start;
   }
-
-  .about-plate {
-    padding: 2.0rem 3.8rem !important; /* Увеличенные внутренние отступы */
-    min-height: 240px;                 /* Дополнительная минимальная высота */
-    border-left-width: 10px;             /* Более выразительный золотой акцент слева */
+  .about-grid > .h-section { position: sticky; top: 88px; }
+  .about-card { padding: clamp(24px, 4vw, 40px); }
+  .about-card p { font-size: 17px; line-height: 1.6; color: var(--mist); max-width: 68ch; }
+  .about-card p + p { margin-top: 18px; }
+  .about-list { margin: 20px 0; display: grid; gap: 12px; }
+  .about-list li {
+    padding: 16px 18px;
+    background: rgba(255,255,255,.02);
+    border-radius: var(--r-btn);
+    box-shadow: var(--hairline);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--mist);
   }
-
-  .about-plate p {
-    font-size: 1.12rem !important;      /* Крупный, читаемый шрифт */
-    line-height: 1.8 !important;        /* Увеличенный межстрочный интервал */
-  }
-
-  @media (max-width: 800px) {
-    .about-grid {
-      grid-template-columns: 1fr;
-    }
-    .about-plate {
-      padding: 1.8rem 1.8rem !important;
-    }
-  }
-
-  /* ============================================================
-     10. НАВЫКИ
-  ============================================================ */
-  .skills-wrap { display: flex; flex-wrap: wrap; gap: .9rem; }
-  .skill-plate {
-    flex: 1 1 220px;
-    max-width: 320px;
+  .about-list .lbl { display: block; color: var(--paper); font-weight: 510; margin-bottom: 4px; }
+  .about-divider { height: 1px; background: var(--graphite); margin: 28px 0; }
+  @media (max-width: 860px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .about-grid > .h-section { position: static; }
   }
 
   /* ============================================================
-     11. ОБРАЗОВАНИЕ
+     7. НАВЫКИ
   ============================================================ */
-  .edu-grid {
+  .skill-rows { box-shadow: 0 -1px 0 var(--graphite); }
+  .skill-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 1.25rem;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr);
+    gap: 16px clamp(24px, 6vw, 80px);
+    padding: 32px 0;
+    box-shadow: 0 1px 0 var(--graphite);
   }
-  @media (max-width: 700px) { .edu-grid { grid-template-columns: 1fr; } }
-  .edu-period { font-size: .82rem; color: var(--text-2); margin-top: .15rem; }
+  .skill-row h3 {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 20px;
+    line-height: 1.33;
+    letter-spacing: -0.012em;
+    font-weight: 510;
+  }
+  .skill-row h3::before {
+    content: "";
+    flex: none;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: .6em;
+    background: var(--dotc, var(--iris));
+  }
+  .skill-row:nth-child(2) { --dotc: var(--green); }
+  .skill-row:nth-child(3) { --dotc: var(--teal); }
+  .skill-row:nth-child(4) { --dotc: var(--coral); }
+  .skill-row p { font-size: 15px; line-height: 1.6; letter-spacing: -0.011em; color: var(--mist); max-width: 64ch; }
+  .skill-row p + p { margin-top: 10px; }
+  .skill-row p.muted { color: var(--fog); }
+  @media (max-width: 760px) { .skill-row { grid-template-columns: 1fr; padding: 24px 0; } }
 
   /* ============================================================
-     12. КОНТАКТЫ
+     8. ОБРАЗОВАНИЕ
+  ============================================================ */
+  .edu-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 760px) { .edu-grid { grid-template-columns: 1fr; } }
+  .edu-card { padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .edu-card h3 { font-size: 24px; line-height: 1.33; letter-spacing: -0.012em; }
+  .edu-card p { font-size: 15px; line-height: 1.6; color: var(--mist); }
+  .edu-card .badge { align-self: flex-start; font-family: var(--font-mono); letter-spacing: -0.013em; }
+  .edu-card .badge.b-green  { color: #6fd488; background: rgba(39,166,68,.14); }
+  .edu-card .badge.b-violet { color: #a5a7f7; background: rgba(99,102,241,.16); }
+  .edu-lines { display: grid; gap: 4px; }
+
+  /* ============================================================
+     9. КОНТАКТЫ (4 ПЛАШКИ)
   ============================================================ */
   .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0,0.9fr) minmax(0,1.1fr);
-    gap: clamp(2rem, 5vw, 4rem);
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: clamp(28px, 6vw, 80px);
     align-items: start;
   }
   @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
-  .contact-list { display: flex; flex-direction: column; gap: .8rem; }
+  .contact-list { display: grid; gap: 12px; }
   .contact-row {
     display: flex;
     align-items: center;
-    gap: .9rem;
-    padding: 1rem 1.2rem;
+    gap: 16px;
+    padding: 20px 24px;
   }
   .contact-row .icon {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--gold) 18%, rgba(255,255,255,0.05));
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: var(--r-btn);
+    background: rgba(255,255,255,.05);
+    display: grid; place-items: center;
+    flex: none;
+    color: var(--mist);
   }
-  .contact-row .icon svg { width: 16px; height: 16px; color: var(--gold-soft); }
-  .contact-row .label { font-size: .78rem; color: var(--text-2); }
-  .contact-row .value { font-size: .98rem; color: var(--text-0); font-weight: 600; text-decoration: none; }
-  .contact-row .value:hover { color: var(--gold-soft); }
+  .contact-row .icon svg { width: 18px; height: 18px; }
+  .contact-row .label { display: block; font-size: 13px; line-height: 1.2; color: var(--fog); margin-bottom: 4px; }
+  .contact-row .value { font-size: 17px; font-weight: 510; letter-spacing: -0.011em; color: var(--paper); overflow-wrap: anywhere; }
+  .contact-row .go { margin-left: auto; width: 16px; height: 16px; color: var(--ash); flex: none; transition: transform .25s ease, color .25s ease; }
+  .contact-row:hover .go { transform: translate(2px, -2px); color: var(--paper); }
 
   footer {
-    padding: 2.5rem 0 3.5rem;
-    text-align: center;
-    color: var(--text-2);
-    font-size: .85rem;
+    margin-top: var(--section-gap);
+    padding: 28px 0 40px;
+    box-shadow: 0 -1px 0 var(--graphite);
+    color: var(--fog);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     10. БОКОВЫЕ ПАНЕЛИ СТАТИСТИКИ
+  ============================================================ */
+  .side-panel {
+    position: fixed;
+    top: 96px;
+    z-index: 40;
+    width: 176px;
+    padding: 12px 14px;
+    background: rgba(15,16,17,.88);
+    border-radius: var(--r-card);
+    box-shadow: var(--hairline);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: -0.013em;
+    color: var(--fog);
+    display: none;
+  }
+  .side-panel-left { left: 20px; }
+  .side-panel-right { right: 20px; }
+  @media (min-width: 1620px) { .side-panel { display: block; } }
+  .sp-title {
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--paper);
+    padding-bottom: 6px; margin-bottom: 8px;
+    box-shadow: 0 1px 0 var(--graphite);
+  }
+  .sp-k { color: var(--ash); }
+  .sp-v { color: var(--mist); }
+  .sp-bar { color: var(--mist); margin: 4px 0; letter-spacing: 0; }
+  .sp-foot { margin-top: 8px; padding-top: 6px; box-shadow: 0 -1px 0 var(--graphite); font-size: 10px; color: var(--ash); }
+  .status-pulse {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 1.6s infinite ease-in-out;
+  }
+  @keyframes blink { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .page, .book-shift, .book { transition-duration: .01s !important; }
+    .status-pulse { animation: none; }
   }
 </style>
 </head>
 <body>
 
-  <canvas id="cursorCanvas"></canvas>
-  <div class="starfield"></div>
-  <canvas id="bgCanvas"></canvas>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
+<!-- Холст кастомного курсора -->
+<canvas id="cursorCanvas"></canvas>
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
-  <div class="topbar">
-    <a href="#top" class="brandmark" id="top">Руслан<span> Альминов</span></a>
-    <a href="#contact" class="quick-contact">Написать</a>
+<!-- Холст фоновых частиц -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Боковые терминалы статистики -->
+<aside class="side-panel side-panel-left" id="panelLeft" aria-hidden="true"></aside>
+<aside class="side-panel side-panel-right" id="panelRight" aria-hidden="true"></aside>
+
+<!-- ВЕРХНЯЯ НАВИГАЦИЯ -->
+<nav class="nav" aria-label="Основная навигация">
+  <div class="container nav-inner">
+    <a href="#hero" class="brandmark" id="top">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 16l8-8M8 11l5-5M11 16l5-5"/></svg>
+      Руслан<span> Альминов</span>
+    </a>
+    <div class="nav-links">
+      <a href="#experience">Опыт работы</a>
+      <a href="#about">Обо мне</a>
+      <a href="#skills">Навыки</a>
+      <a href="#education">Образование и сертификаты</a>
+    </div>
+    <a href="#contact" class="nav-cta">Написать</a>
   </div>
+</nav>
 
-  <main>
-    <!-- ============================================================
-         ШАПКА (HERO) — ТЕКСТ СЛЕВА, ФОТО СПРАВА
-    ============================================================ -->
-    <header class="hero">
-      <div class="container hero-grid">
-        <div class="hero-text">
-          <p class="hero-eyebrow-role">Профессия и специализация</p>
-          <h1>Руслан Альминов</h1>
-          <p class="hero-intro">
-            Администратор банковских систем | Backend & Automation Specialist
-          <p class=class="hero-intro">
-            Я объединяю практический опыт банковского обслуживания с инженерным подходом к IT. Настраиваю системные процессы, работаю с АБС, CRM и API, а также создаю скрипты автоматизации (Python (Django / FastAPI / Flask) • REST API • PostgreSQL / SQLite • Linux / Nginx / Git), чтобы превратить рутину в надежно работающие алгоритмы.
-          </p>
-          <p class=class="hero-intro">
-            
-          <a href="#experience" class="hero-scrollcue">
+<main>
+  <!-- ============================================================
+       ШАПКА (HERO)
+  ============================================================ -->
+  <header class="hero" id="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <p class="hero-eyebrow-role"><span class="pill">Профессия и специализация</span></p>
+        <h1>Руслан Альминов</h1>
+        <p class="hero-lead">Администратор банковских систем | Backend &amp; Automation Specialist</p>
+        <p class="hero-intro">Я объединяю практический опыт банковского обслуживания с инженерным подходом к IT. Настраиваю системные процессы, работаю с АБС, CRM и API, а также создаю скрипты автоматизации (Python, PowerShell, n8n), чтобы превратить рутину в надежно работающие алгоритмы.</p>
+        <div class="hero-actions">
+          <a href="#experience" class="btn btn-primary">
             Смотреть опыт работы
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
           </a>
         </div>
-
-        <!-- Аватарка в правой части -->
-        <div class="hero-avatar">
-          <img src="images/photo.png" alt="Фото">
-        </div>
-      </div>
-    </header>
-
-    <!-- ============================================================
-         ОПЫТ РАБОТЫ — 3D КНИГА НА 4 СТРАНИЦЫ
-    ============================================================ -->
-    <section class="section book-section" id="experience">
-      <div class="container">
-        <div class="section-head">
-          <h1>Опыт работы</h1>
-          <p class="section-note">Пролистайте книгу стрелками или точками ниже — каждая страница отдельное место работы.</p>
-        </div>
       </div>
 
-      <div class="book-stage">
-        <div class="book" id="book">
-
-          <!-- СТРАНИЦА 1 -->
-          <div class="page" data-index="0">
-            <div class="page-front">
-              <div class="page-bg" data-bg="0"></div>
-              <div class="page-tint"></div>
-              <div class="page-content">
-                <p class="page-index">Страница 1 из 4</p>
-                <div class="page-company">
-                  <span class="page-company-bar"></span>
-                  <h3>IT|Программирование (Backend & Автоматизация)</h3>
-                </div>
-                <p class="page-role">Програмирование — 06.2024 – до сих пор</p>
-                <p class="page-body">
-                  Интеграция сторонних API: Разрабатывал и внедрял модули сопряжения на Python (FastAPI / Flask) для автоматического обмена данными между внутренними сервисами и внешними REST API системами.
-                  Настройка фоновых задач и обработки данных: Оптимизировал скрипты автоматизации и фоновые процессы (Celery / n8n / Cron) для сборки, валидации и генерации отчетов в PostgreSQL/SQLite, что сократило время ручной обработки данных на 70%.
-                  Исправление багов и поддержка пользователей: Проводил диагностику сложных технических инцидентов 2-й и 3-й линии поддержки, оперативно находил и устранял ошибки в коде и SQL-запросах (pgAdmin), восстанавливая корректную работу сервисов.
-                </p>
-                <div class="page-tags">
-                  <span class="page-tag">Python</span>
-                  <span class="page-tag">PowerShell</span>
-                  <span class="page-tag">PostgreSQL</span>
-                  <span class="page-tag">REST API</span>
-                  <span class="page-tag">Django</span>
-                  <span class="page-tag">Git</span>
-                </div>
-              </div>
-            </div>
-            <div class="page-back"></div>
-          </div>
-
-          <!-- СТРАНИЦА 2 -->
-          <div class="page" data-index="1">
-            <div class="page-front">
-              <div class="page-bg" data-bg="1"></div>
-              <div class="page-tint"></div>
-              <div class="page-content">
-                <p class="page-index">Страница 2 из 4</p>
-                <div class="page-company">
-                  <span class="page-company-bar"></span>
-                  <h3>Asian Business Group</h3>
-                </div>
-                <p class="page-role">Стажер юридического отдела / Помощник главного юриста — 06.2019г — 08.2019 г</p>
-                <p class="page-body">
-                  Оказывал всестороннюю помощь главному юристу компании в подготовке правовых заключений, сборе и анализе нормативно-правовой базы.
-                  Осуществлял трехязычный письменный перевод (русский, английский, таджикский) юридической документации, договоров, соглашений и официальной переписки.
-                  Участвовал в первичной правовой экспертизе, структурировании договоров и систематизации архива юридических дел.
-                  Выполнял аналитические и административные поручения, обеспечивая стабильное правовое сопровождение проектов компании.
-                </p>
-                <div class="page-tags">
-                  <span class="page-tag">Таблицы Exel</span>
-                  <span class="page-tag">Документы Word</span>
-                  <span class="page-tag">Презинтации PowerPoint</span>
-                </div>
-              </div>
-            </div>
-            <div class="page-back"></div>
-          </div>
-
-          <!-- СТРАНИЦА 3 -->
-          <div class="page" data-index="2">
-            <div class="page-front">
-              <div class="page-bg" data-bg="2"></div>
-              <div class="page-tint"></div>
-              <div class="page-content">
-                <p class="page-index">Страница 3 из 4</p>
-                <div class="page-company">
-                  <span class="page-company-bar"></span>
-                  <h3>Промышленный сектор ҶСП "Комбинати Шири Душанбе"</h3>
-                </div>
-                <p class="page-role">Оператор производственного оборудования  — 11.2021 — 03.2022</p>
-                <p class="page-body">
-                  Отвечал за непрерывную, стабильную и безопасную работу технологического оборудования на производстве.
-                  Проводил первичную калибровку, пусконаладку, физическую и программную настройку рабочих параметров машины перед запуском производственных циклов.
-                  Осуществлял постоянный мониторинг состояния техники, оперативно выявлял и устранял как программные ошибки, так и аппаратные неисправности.
-                  Обеспечивал строгое соблюдение регламентов технологического процесса и норм техники безопасности.
-                </p>
-                <div class="page-tags">
-                  <span class="page-tag">Навык 7</span>
-                  <span class="page-tag">Навык 8</span>
-                </div>
-              </div>
-            </div>
-            <div class="page-back"></div>
-          </div>
-
-          <!-- СТРАНИЦА 4 -->
-          <div class="page" data-index="3">
-            <div class="page-front">
-              <div class="page-bg" data-bg="3"></div>
-              <div class="page-tint"></div>
-              <div class="page-content">
-                <p class="page-index">Страница 4 из 4</p>
-                <div class="page-company">
-                  <span class="page-company-bar"></span>
-                  <h3>Алиф Банк</h3>
-                </div>
-                <p class="page-role">Администратор / Специалист банковского обслуживания — 07.2025 – до сих пор</p>
-                <p class="page-body">
-                  Администрировал банковские системы АБС, CRM и Helpdesk TSM, обеспечивая устойчивую работу сервисов.
-                  Консультировал клиентов, оформлял кредиты и банковские карты Visa, Корти Милли и Mastercard. Проводил кассовые операции
-                  и оперативно устранял технические сбои мобильного приложения. Писал скрипты на Python для оптимизации и автоматизации внутренних
-                  процессов, успешно окончив Alif Academy с официальным рекомендательным письмом.
-                </p>
-                <div class="page-tags">
-                  <span class="page-tag">Работа с ABS</span>
-                  <span class="page-tag">Работа с CRM</span>
-                  <span class="page-tag">Helpdesk TSM</span>
-                  <span class="page-tag">Кассовые операции</span>
-                </div>
-              </div>
-            </div>
-            <div class="page-back"></div>
-          </div>
-
+      <div class="photo-frame">
+        <div class="photo-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="photo-screen" id="photoScreen">
+          <img src="images/photo.png" alt="Фото" onerror="this.parentNode.classList.add('no-photo')">
+          <div class="photo-mono" aria-hidden="true">РА</div>
         </div>
       </div>
+    </div>
+  </header>
 
-      <div class="container">
+  <!-- Полоса инструментов -->
+  <div class="tools" aria-label="Инструменты">
+    <div class="container tools-row">
+      <span>Python</span><span>PowerShell</span><span>PostgreSQL</span><span>REST API</span><span>Git</span><span>GitHub</span><span>n8n</span><span>PyCharm</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ОПЫТ РАБОТЫ — 3D КНИГА НА 4 СТРАНИЦЫ
+  ============================================================ -->
+  <section class="section" id="experience">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="h-section">Опыт работы</h2>
+        <p class="section-note">Пролистайте книгу стрелками или точками ниже — каждая страница отдельное место работы.</p>
+      </div>
+
+      <div class="showcase" id="showcase">
+        <div class="book-viewport" id="bookViewport" tabindex="0" aria-label="Опыт работы — книга">
+          <div class="book-scale" id="bookScale">
+            <div class="book-shift" id="bookShift">
+              <div class="book" id="book">
+                <div class="stack stack-l"></div>
+                <div class="stack stack-r"></div>
+
+                <!-- СТРАНИЦА 1 -->
+                <div class="page" data-index="0" style="--accent: var(--iris)">
+                  <div class="page-front">
+                    <div class="page-bg" data-bg="0"></div>
+                    <div class="page-tint"></div>
+                    <div class="page-content">
+                      <div class="page-top"><span class="page-index">Страница 1 из 4</span></div>
+                      <div class="page-company"><h3>IT|Программирование</h3></div>
+                      <p class="page-role">Програмирование — 06.2025 – до сих пор</p>
+                      <div class="page-body">
+                        <p><span class="lbl">Проектирование и интеграция REST API (FastAPI / Flask):</span>Разрабатывал и внедрял модули сопряжения и бэкенд-сервисы на Python с использованием фреймворков FastAPI и Flask. Настраивал безопасный двусторонний обмен данными между внутренними микросервисами и сторонними веб-службами (REST API, Webhooks). Реализовывал механизмы авторизации, сериализации данных, обработки ошибок, логирования и валидации входящих запросов.</p>
+                        <p><span class="lbl">Администрирование баз данных и оптимизация SQL (PostgreSQL / SQLite):</span>Осуществлял проектирование и поддержку структур баз данных в PostgreSQL и SQLite. Через среду pgAdmin составлял, отлаживал и оптимизировал сложные SQL-запросы, агрегации, функции и индексы. Обеспечивал целостность данных, проводил миграции схемы БД и выстраивал процедуру регулярного резервного копирования.</p>
+                        <p><span class="lbl">Диагностика инцидентов, поддержка L2/L3 и исправление багов:</span>Осуществлял техническую поддержку 2-й и 3-й линии: локализовал сбои в работе сервисов, анализировал серверные логи и стектрейсы ошибок. Оперативно находил логические ошибки в коде и некорректные вызовы БД, выпускал патчи и хотфиксы, предотвращая простои критически важных систем.</p>
+                        <p><span class="lbl">Стандарты разработки и контроль версий (Git / GitHub):</span>Применял навыки, полученные в Alif Academy: писал чистый, поддерживаемый код с соблюдением принципов ООП и DRY. Вел разработку в системе контроля версий Git/GitHub (создание веток, оформление Pull Request, проведение code review, разрешение конфликтов слияния), следуя командным регламентам CI/CD.</p>
+                        <p class="lbl">Используемый стек и программное обеспечание:</p>
+                        <ul>
+                          <li><span class="lbl">IDE и среда разработки:</span> PyCharm Professional.</li>
+                          <li><span class="lbl">Языки программирования и скриптинг:</span> Python, PowerShell.</li>
+                          <li><span class="lbl">Базы данных и API:</span> PostgreSQL, pgAdmin, проектирование и работа с REST API.</li>
+                          <li><span class="lbl">Системы контроля версий:</span> Git, GitHub.</li>
+                          <li>Low-Code.</li>
+                        </ul>
+                      </div>
+                      <div class="page-tags">
+                        <span class="page-tag">Python</span>
+                        <span class="page-tag">L2/L3 Поддержка & Поиск багов</span>
+                        <span class="page-tag">pgAdmin</span>
+                        <span class="page-tag">Django/FastAPI/Flask</span>
+                        <span class="page-tag">PowerShell</span>
+                        <span class="page-tag">PostgreSQL</span>
+                        <span class="page-tag">Разработка REST API</span>
+                        <span class="page-tag">Git</span>
+                        <span class="page-tag">GitHub</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="page-back">
+                    <div class="page-bg" data-bg="0"></div>
+                    <div class="page-tint"></div>
+                    <div class="back-content">
+                      <div class="back-num">01</div>
+                      <div><div class="back-bar"></div><p class="back-title">IT|Программирование (Backend &amp; Автоматизация)</p></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- СТРАНИЦА 2 -->
+                <div class="page" data-index="1" style="--accent: #E7B24C">
+                  <div class="page-front">
+                    <div class="page-bg" data-bg="1"></div>
+                    <div class="page-tint"></div>
+                    <div class="page-content">
+                      <div class="page-top"><span class="page-index">Страница 2 из 4</span></div>
+                      <div class="page-company"><h3>Asian Business Group</h3></div>
+                      <p class="page-role">Стажер юридического отдела / Помощник главного юриста — 06.2019г — 08.2019 г</p>
+                      <div class="page-body">
+                        <p><span class="lbl">Правовая экспертиза и договорная работа:</span>Участвовал в разработке, правовой экспертизе и структурировании договоров различных типов (договоры оказания услуг, купли-продажи, поставки, аренды, соглашения о конфиденциальности NDA). Составлял дополнительные соглашения, протоколы разногласий и типовые формы документов. Проводил первичную проверку контрагентов (Due Diligence) по открытым государственным реестрам для минимизации юридических и финансовых рисков компании.</p>
+                        <p><span class="lbl">Юридический анализ и правовые заключения:</span>Оказывал всестороннюю аналитическую поддержку главному юристу: осуществлял сбор, мониторинг и систематизацию нормативно-правовой базы, изучал судебную и правоприменительную практику. Готовил аналитические справки, меморандумы и проекты правовых заключений по спорным вопросам корпоративного, трудового и гражданского права.</p>
+                        <p><span class="lbl">Профессиональный трехязычный перевод:</span>Выполнял точный письменный перевод юридической документации, внешнеторговых контрактов, учредительных документов, локальных нормативных актов и официальной деловой переписки на трех языках (русский, английский, таджикский). Обеспечивал строгое соответствие терминологии требованиям законодательства и международным стандартам бизнес-документооборота.</p>
+                        <p><span class="lbl">Претензионная работа и судебное сопровождение:</span>Оказывал помощь в ведении претензионно-исковой работы: участвовал в подготовке досудебных претензий, ответов на обращения, исковых заявлений, ходатайств и процессуальных документов. Отслеживал процессуальные сроки, движения исковых заявлений и статус рассмотрения дел в судебных инстанциях.</p>
+                        <p><span class="lbl">Юридическое делопроизводство и архивация:</span>Осуществлял ведение, систематизацию и цифровизацию реестра договоров, доверенностей и юридических дел компании. Сформировал и упорядочил электронный и физический архив правовой документации, что ускорило поиск исторических материалов и проведение внутренних аудитов.</p>
+                      </div>
+                      <div class="page-tags">
+                        <span class="page-tag">Due Diligence</span>
+                        <span class="page-tag">Трехязычный перевод (RU/EN/TJ)l</span>
+                        <span class="page-tag">Ведение юридического архива</span>
+                        <span class="page-tag">Взаимодействие с нотариатом и госорганами</span>
+                        <span class="page-tag">Документы Word</span>
+                        <span class="page-tag">Таблицы Exel</span>
+                        <span class="page-tag">Презинтации PowerPoint</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="page-back">
+                    <div class="page-bg" data-bg="1"></div>
+                    <div class="page-tint"></div>
+                    <div class="back-content">
+                      <div class="back-num">02</div>
+                      <div><div class="back-bar"></div><p class="back-title">Asian Business Group</p></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- СТРАНИЦА 3 -->
+                <div class="page" data-index="2" style="--accent: var(--coral)">
+                  <div class="page-front">
+                    <div class="page-bg" data-bg="2"></div>
+                    <div class="page-tint"></div>
+                    <div class="page-content">
+                      <div class="page-top"><span class="page-index">Страница 3 из 4</span></div>
+                      <div class="page-company"><h3>Промышленный сектор ҶСП "Комбинати Шири Душанбе"</h3></div>
+                      <p class="page-role">Оператор производственного оборудования  — 11.2021 — 03.2022</p>
+                      <div class="page-body">
+                        <p><span class="lbl">Пусконаладка, калибровка и программная настройка:</span>Проводил полную предзапусковую подготовку, первичную калибровку и программно-аппаратную настройку фасовочно-упаковочных линий. Настраивал рабочие параметры оборудования через панель управления (HMI/ПЛК): задавал точную дозировку, температуру запайки, давление пневмосистемы, скорость конвейерных лент и алгоритмы упаковочного цикла под различные типы продукции и форматы тары.</p>
+                        <p><span class="lbl">Системный мониторинг и устранение программно-аппаратных сбоев:</span>Обеспечивал непрерывную, высокопроизводительную и безопасную работу автоматизированных комплексов розлива, укупорки, этикетирования и групповой упаковки. Осуществлял постоянный контроль точности налива, герметичности укупорки, качества запайки швов и корректности нанесения маркировки (даты, серии, штрихкодов).</p>
+                        <p><span class="lbl">Техническое обслуживание и предупредительный ремонт (ТО):</span>Участвовал в проведении планово-предупредительного ремонта (ППР) и регулярного технического обслуживания оборудования. Проводил чистку, смазку движущихся узлов, замену изнашивающихся элементов (уплотнителей, ножей, форсунок, нагревателей) и проверку герметичности пневматических и гидравлических магистралей.</p>
+                        <p><span class="lbl">Контроль качества, санитарные нормы и техника безопасности:</span>Обеспечивал строгое соблюдение технологических регламентов, стандартов качества (HACCP/ISO) и правил охраны труда и техники безопасности (ОТ и ТБ). Участвовал в процедурах санитарной обработки и CIP-мойки оборудования розлива для предотвращения брака и обеспечения стерильности.</p>
+                        <p><span class="lbl">Учет простоев и оптимизация процессов:</span>Вел учет показателей работы смены, фиксировал причины и длительность технологических останов, анализировал системные ошибки. Вносил предложения по оптимизации рабочих параметров машин, что позволило сократить объем отходов упаковочного материала и минимизировать время переналадки линии при переходе на новый продукт.</p>
+                      </div>
+                      <div class="page-tags">
+                        <span class="page-tag">Обслуживание линий розлива и упаковки</span>
+                        <span class="page-tag">Настройка HMI/ПЛК</span>
+                        <span class="page-tag">Калибровка датчиков</span>
+                        <span class="page-tag">Диагностика аппаратных и программных сбоев</span>
+                        <span class="page-tag">Планово-предупредительный ремонт (ППР)</span>
+                        <span class="page-tag">Соблюдение HACCP и ТБ</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="page-back">
+                    <div class="page-bg" data-bg="2"></div>
+                    <div class="page-tint"></div>
+                    <div class="back-content">
+                      <div class="back-num">03</div>
+                      <div><div class="back-bar"></div><p class="back-title">Промышленный сектор ҶСП "Комбинати Шири Душанбе"</p></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- СТРАНИЦА 4 -->
+                <div class="page" data-index="3" style="--accent: var(--green)">
+                  <div class="page-front">
+                    <div class="page-bg" data-bg="3"></div>
+                    <div class="page-tint"></div>
+                    <div class="page-content">
+                      <div class="page-top"><span class="page-index">Страница 4 из 4</span></div>
+                      <div class="page-company"><h3>Алиф Банк</h3></div>
+                      <p class="page-role">Администратор / Специалист банковского обслуживания — 07.2025 – до сих пор</p>
+                      <div class="page-body">
+                        <p><span class="lbl">Администрирование АБС и системных процессов:</span> Осуществляю сопровождение и мониторинг АБС (Автоматизированной Банковской Системы). Отвечаю за открытие, ведение и закрытие банковских счетов физических лиц, обработку межбанковских платежей, проводку финансовых транзакций, корректное отражение операций по балансовым счетам и ежедневную выгрузку аналитической отчетности.</p>
+                        <p><span class="lbl">CRM и банковские продукты:</span> Введу клиентоориентированную работу через единую CRM-платформу. Сопровождаю полный цикл розничных продуктов: проведение первичной идентификации, кредитный скоринг, оформление потребительских кредитов, открытие депозитов, а также моментальный выпуск, активизацию и обслуживание банковских карт (Visa, Корти Милли, Mastercard).</p>
+                        <p><span class="lbl">Helpdesk, TSM и кросс-командное взаимодействие:</span> Обрабатываю и эскалирую инциденты в системе Helpdesk TSM. Тесно взаимодействую с смежными отделами — IT-департаментом, службой безопасности, департаментом рисков, юристами и процессингом для оперативного локализации технических сбоев в работе мобильного приложения, POS-терминалов и внутренних сервисов.</p>
+                        <p><span class="lbl">Кассовый узел и наличный оборот:</span> Провожу кассовые и валютно-обменные операции с соблюдением требований регулятора: прием и выдача наличных денежных средств, подкрепление и инкассация, работа с банкоматами/терминалами самообслуживания, сверка кассовых остатков и ведение книги учета ценностей.</p>
+                        <p><span class="lbl">Оптимизация и Alif Academy:</span> Разрабатываю скрипты на Python для автоматизации повторяющихся задач, парсинга логов и ускорения обработки данных. Успешно окончил Alif Academy с официальным рекомендательным письмом.</p>
+                      </div>
+                      <div class="page-tags">
+                        <span class="page-tag">Администрирование ABS</span>
+                        <span class="page-tag">Работа с CRM</span>
+                        <span class="page-tag">Helpdesk</span>
+                        <span class="page-tag">TSM</span>
+                        <span class="page-tag">Кассовые & Валютные операции</span>
+                        <span class="page-tag">Кросс-функциональное взаимодействие</span>
+                        <span class="page-tag">Выпуск и обслуживание карт (Visa/Mastercard/Корти Милли)</span>
+                        <span class="page-tag">Кредитный скоринг & Депозиты</span>
+                        <span class="page-tag">Аналитика и банковская отчетность</span>
+                        <span class="page-tag">Обслуживание терминалов & Инкассация</span>
+                        <span class="page-tag">Диагностика и Troubleshooting</span>
+                        <span class="page-tag">Первичная идентификация (KYC)</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="page-back">
+                    <div class="page-bg" data-bg="3"></div>
+                    <div class="page-tint"></div>
+                    <div class="back-content">
+                      <div class="back-num">04</div>
+                      <div><div class="back-bar"></div><p class="back-title">Алиф Банк</p></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="book-nav">
-          <button type="button" id="prevBtn" aria-label="Предыдущая страница">
+          <button type="button" class="nbtn" id="prevBtn" aria-label="Предыдущая страница">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
           <div class="book-dots" id="bookDots"></div>
-          <button type="button" id="nextBtn" aria-label="Следующая страница">
+          <span class="book-count mono" id="bookCount">1 / 4</span>
+          <button type="button" class="nbtn" id="nextBtn" aria-label="Следующая страница">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============================================================
-         ОБО МНЕ
-    ============================================================ -->
-    <section class="section" id="about">
-      <div class="container about-grid">
-        <div>
-          <h2>Обо мне</h2>
-        </div>
-        <div class="plate about-plate">
-          <p>
-            Я специалист с высшим образованием и разносторонним бэкграундом — от настройки промышленного оборудования до работы с финансовыми продуктами и IT-инфраструктурой.
-            В банковском секторе мой фокус направлен на два ключевых направления:
-            Качественный сервис и операции: уверенно работаю с кассовыми операциями, оформлением кредитных продуктов и банковских карт (Visa, Корти Милли, Mastercard), а также помогу клиентам решить любые технические вопросы с приложением.
-            Системная поддержка и автоматизация: глубоко понимаю внутренние банковские процессы (АБС, CRM, тикетинг TSM), умею проектировать backend-логику, работать с API и оптимизировать рабочие сценарии через автоматизацию.
-          </p>
-          <p style="margin-top: 1.2rem;">
-            Опытный специалист в сфере банковского администрирования с фокусом на цифровизации и оптимизации инфраструктуры. Мой приоритет — превращение сложных, повторяющихся операционных задач в отлаженные и автоносно работающие алгоритмы. Свободно применяю Python и PowerShell для написания скриптов любой сложности, а также использую платформу n8n для построения бесшовных интеграций и автоматизированных сценариев между сервисами. Сочетаю высокие стандарты ответственности банковского сектора с современными инженерными IT-практиками.
-          </p>
-        </div>
+  <!-- ============================================================
+       ОБО МНЕ
+  ============================================================ -->
+  <section class="section" id="about">
+    <div class="container about-grid">
+      <h2 class="h-section">Обо мне</h2>
+      <div class="card about-card">
+        <p>Я специалист с высшим образованием и разносторонним бэкграундом — от настройки промышленного оборудования до работы с финансовыми продуктами и IT-инфраструктурой. В банковском секторе мой фокус направлен на два ключевых направления:</p>
+        <ul class="about-list">
+          <li><span class="lbl">Качественный сервис и операции:</span> уверенно работаю с кассовыми операциями, оформлением кредитных продуктов и банковских карт (Visa, Корти Милли, Mastercard), а также помогу клиентам решить любые технические вопросы с приложением.</li>
+          <li><span class="lbl">Системная поддержка и автоматизация:</span> глубоко понимаю внутренние банковские процессы (АБС, CRM, тикетинг TSM), умею проектировать backend-логику, работать с API и оптимизировать рабочие сценарии через автоматизацию.</li>
+        </ul>
+        <div class="about-divider"></div>
+        <p>Опытный специалист в сфере банковского администрирования с фокусом на цифровизации и оптимизации инфраструктуры. Мой приоритет — превращение сложных, повторяющихся операционных задач в отлаженные и автоносно работающие алгоритмы. Свободно применяю Python и PowerShell для написания скриптов любой сложности, а также использую платформу n8n для построения бесшовных интеграций и автоматизированных сценариев между сервисами. Сочетаю высокие стандарты ответственности банковского сектора с современными инженерными IT-практиками.</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============================================================
-         НАВЫКИ
-    ============================================================ -->
-    <section class="section" id="skills">
-      <div class="container">
-        <div class="section-head">
-          <h2>Навыки</h2>
-          <p class="section-note">Основные инструменты и области.</p>
+  <!-- ============================================================
+       НАВЫКИ
+  ============================================================ -->
+  <section class="section" id="skills">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="h-section">Навыки</h2>
+        <p class="section-note">Основные инструменты и области.</p>
+      </div>
+      <div class="skill-rows">
+        <div class="skill-row">
+          <h3>IT, Разработка и Автоматизация</h3>
+          <div>
+            <p>Python, PowerShell, PyCharm Professional.</p>
+            <p>Backend &amp; Интеграции: Разработка Backend-логики, работа с REST API, построение сценариев автоматизации в n8n</p>
+          </div>
         </div>
-        <div class="skills-wrap">
-          <div class="plate skill-plate">
-            <h4>IT, Разработка и Автоматизация</h4>
-            <p>
-              Python, PowerShell, PyCharm Professional.
-              Backend & Интеграции: Разработка Backend-логики, работа с REST API, построение сценариев автоматизации в n8n
-            </p>
+        <div class="skill-row">
+          <h3>Банковский сектор Alif Bank — Администратор / Специалист</h3>
+          <div>
+            <p>Специализированный софт: АБС, CRM, Admin-панели, Helpdesk, TSM.</p>
+            <p>Продукты и Сервис: Кассовые операции, выпуск и обслуживание карт (Visa, Корти Милли, Mastercard), выдача микрокредитов, техническая поддержка пользователей приложения</p>
           </div>
-          <div class="plate skill-plate plate--violet">
-            <h4>Банковский сектор Alif Bank — Администратор / Специалист</h4>
-            <p>
-              Специализированный софт: АБС, CRM, Admin-панели, Helpdesk, TSM.
-              Продукты и Сервис: Кассовые операции, выпуск и обслуживание карт (Visa, Корти Милли, Mastercard), выдача микрокредитов, техническая поддержка пользователей приложения
-            </p>
-          </div>
-          <div class="plate skill-plate">
-            <h4>Asian Business Group</h4>
+        </div>
+        <div class="skill-row">
+          <h3>Asian Business Group</h3>
+          <div>
             <p>Стажировка Младший помощник юриста, работа с документацией перевод её, ещё работа регламентами и бизнес-процессами. </p>
-            <p>
-            Составление Презинтаций, Таблиц, Документов (PowerPoint, Exel, Word, Outlook)
-            </p>
+            <p>Составление Презинтаций, Таблиц, Документов (PowerPoint, Exel, Word, Outlook)</p>
           </div>
-          <div class="plate skill-plate plate--violet">
-            <h4>Выпускник Alif Academy </h4>
-            <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub).
-               Получил рекомендательное письмо об успешном окончании курсов.</p>
+        </div>
+        <div class="skill-row">
+          <h3>Выпускник Alif Academy </h3>
+          <div>
+            <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub). Получил рекомендательное письмо об успешном окончании курсов.</p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============================================================
-         ОБРАЗОВАНИЕ
-    ============================================================ -->
-    <section class="section" id="education">
-      <div class="container">
-        <div class="section-head">
-          <h2>Образование и сертификаты</h2>
+  <!-- ============================================================
+       ОБРАЗОВАНИЕ
+  ============================================================ -->
+  <section class="section" id="education">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="h-section">Образование и сертификаты</h2>
+      </div>
+      <div class="edu-grid">
+        <div class="card edu-card">
+          <h3>Выпускник Alif Academy</h3>
+          <span class="badge b-green">06.2025 – 06.2026</span>
+          <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub). Получил рекомендательное письмо об успешном окончании курсов.</p>
         </div>
-        <div class="edu-grid">
-          <div class="plate">
-            <h3>Выпускник Alif Academy</h3>
-            <p class="edu-period">06.2025 – 06.2026</p>
-            <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub).
-               Получил рекомендательное письмо об успешном окончании курсов.</p>
-          </div>
-          <div class="plate plate--violet">
-            <h3>Юридическое образование</h3>
-            <p class="edu-period">09.2015 – 07.2021</p>
+        <div class="card edu-card">
+          <h3>Юридическое образование</h3>
+          <span class="badge b-violet">09.2015 – 07.2021</span>
+          <div class="edu-lines">
             <p>Российско-Таджикский (Славянский) университет</p>
             <p>Факультет: Юридический (Бакалаврият, Магистратура)</p>
             <p>Специальность: Юрист</p>
@@ -899,58 +1148,79 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============================================================
-         КОНТАКТЫ
-    ============================================================ -->
-    <section class="section" id="contact">
-      <div class="container contact-grid">
-        <div>
-          <h1>Связаться со мной</h1>
-        </div>
-        <div class="contact-list">
-          <a class="plate contact-row" href="Laststyle92@gmail.com">
-            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
-            <span>
-              <span class="label" style="display:block;">Email</span>
-              <span class="value">Laststyle92@gmail.com</span>
-            </span>
-          </a>
-          <a class="plate contact-row plate--violet" href="@prototypear">
-            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15.5c0 .4-.3.9-.7 1.1a17 17 0 0 1-3 1.2 15.8 15.8 0 0 1-11.1-11 17 17 0 0 1 1.2-3c.2-.4.7-.7 1.1-.7h2.4c.5 0 .9.3 1 .8l.7 3a1 1 0 0 1-.3 1L11 9.2a11.3 11.3 0 0 0 3.8 3.8l1.3-1.3a1 1 0 0 1 1-.3l3 .7c.5.1.8.5.8 1V15.5z"/></svg></span>
-            <span>
-              <span class="label" style="display:block;">Telegram</span>
-              <span class="value">@prototypear</span>
-            </span>
-          </a>
+  <!-- ============================================================
+       КОНТАКТЫ (4 ПЛАШКИ)
+  ============================================================ -->
+  <section class="section" id="contact">
+    <div class="container contact-grid">
+      <h2 class="h-section">Связаться со мной</h2>
+      <div class="contact-list">
+        <!-- 1. Email -->
+        <a class="card contact-row" href="mailto:Laststyle92@gmail.com">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
+          <span>
+            <span class="label">Email</span>
+            <span class="value">Laststyle92@gmail.com</span>
+          </span>
+          <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg>
+        </a>
+
+        <!-- 2. Telegram -->
+        <a class="card contact-row" href="https://t.me/prototypear" target="_blank" rel="noopener">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 4L3 11l6 2.5L11 20l3-4.5 5 3.5L21 4z"/><path d="M9 13.5L21 4"/></svg></span>
+          <span>
+            <span class="label">Telegram</span>
+            <span class="value">@prototypear</span>
+          </span>
+          <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg>
+        </a>
+
+        <!-- 3. GitHub / портфолио -->
+        <a class="card contact-row" href="https://github.com/Laststyle92" target="_blank" rel="noopener">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span>
+          <span>
+            <span class="label">GitHub / портфолио</span>
+            <span class="value">github.com/Laststyle92</span>
+          </span>
+          <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg>
+        </a>
+
+        <!-- 4. Локация -->
+        <div class="card contact-row">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-7.3 7-12a7 7 0 0 0-14 0c0 4.7 7 12 7 12z"/></svg></span>
+          <span>
+            <span class="label">Локация</span>
+            <span class="value">Душанбе, Таджикистан</span>
+          </span>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+</main>
 
-  <footer>© 2026 Сайт создан и написан в ручную, права не защищены и открыты для плагиата, RR</footer>
+<footer>
+  <div class="container">© 2026 Сайт создан и написан в ручную, права не защищены и открыты для плагиата, RR</div>
+</footer>
 
 <script>
 (function () {
   "use strict";
 
-  const pageBackgrounds = [
-    "images/company1.png",
-    "images/company2.png",
-    "images/company3.png",
-    "images/company4.png"
-  ];
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
 
-  const pageFallbackColors = ["#E7B24C", "#8C7FEA", "#5FBF9F", "#E08A5B"];
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  /* КУРСОР */
+  /* ============================================================
+     1. КУРСОР СО ШЛЕЙФОМ ИЗ ИСКР
+  ============================================================ */
   (function initCursor() {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (!finePointer) return;
     document.body.classList.add("has-custom-cursor");
 
     const canvas = document.getElementById("cursorCanvas");
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let cw, ch;
     function resize() { cw = canvas.width = window.innerWidth; ch = canvas.height = window.innerHeight; }
@@ -969,7 +1239,7 @@
       if (sparks.length > 26) sparks.shift();
     });
 
-    document.querySelectorAll("a, button, .plate, .page, .dot").forEach(function (el) {
+    document.querySelectorAll("a, button, .card, .page, .dot, .nbtn").forEach(function (el) {
       el.addEventListener("mouseenter", function () { isHovering = true; });
       el.addEventListener("mouseleave", function () { isHovering = false; });
     });
@@ -991,7 +1261,7 @@
         const s = sparks[i];
         const r = (isHovering ? 13 : 8) * (0.35 + s.life * 0.65);
         drawGlow(s.x, s.y, r, s.life * 0.5);
-        s.life -= prefersReducedMotion ? 1 : 0.05;
+        s.life -= reduceMotion ? 1 : 0.05;
       }
       sparks = sparks.filter(function (s) { return s.life > 0; });
       drawGlow(mouseX, mouseY, isHovering ? 15 : 9, 0.95);
@@ -1000,36 +1270,12 @@
     draw();
   })();
 
-  /* 3D TILT */
-  function attachTilt(el, intensity) {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    el.addEventListener("mousemove", function (e) {
-      const rect = el.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width - 0.5;
-      const py = (e.clientY - rect.top) / rect.height - 0.5;
-      el.style.transform = "perspective(800px) rotateX(" + (-py * intensity).toFixed(2) + "deg) rotateY(" + (px * intensity).toFixed(2) + "deg)";
-    });
-    el.addEventListener("mouseleave", function () { el.style.transform = ""; });
-  }
-  document.querySelectorAll(".plate").forEach(function (el) { attachTilt(el, 5); });
-
-  const bookEl = document.getElementById("book");
-  if (bookEl && window.matchMedia("(pointer: fine)").matches) {
-    const baseTransform = "rotateX(5deg) rotateY(-6deg)";
-    document.querySelector(".book-stage").addEventListener("mousemove", function (e) {
-      const rect = bookEl.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width - 0.5;
-      const py = (e.clientY - rect.top) / rect.height - 0.5;
-      bookEl.style.transform = "rotateX(" + (5 - py * 8).toFixed(2) + "deg) rotateY(" + (-6 + px * 10).toFixed(2) + "deg)";
-    });
-    document.querySelector(".book-stage").addEventListener("mouseleave", function () {
-      bookEl.style.transform = baseTransform;
-    });
-  }
-
-  /* ФОНОВЫЕ ЧАСТИЦЫ */
+  /* ============================================================
+     2. ФОНОВЫЕ ЧАСТИЦЫ (НИЖЕ БЛОКА ИНСТРУМЕНТОВ)
+  ============================================================ */
   (function initBackground() {
     const canvas = document.getElementById("bgCanvas");
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let w, h, particles = [];
 
@@ -1063,10 +1309,23 @@
       targetY = (e.clientY / window.innerHeight) - 0.5;
     });
 
+    const toolsEl = document.querySelector(".tools");
+
     function tick() {
       ctx.clearRect(0, 0, w, h);
       parX += (targetX - parX) * 0.02;
       parY += (targetY - parY) * 0.02;
+
+      let topLimit = 0;
+      if (toolsEl) {
+        topLimit = Math.max(0, toolsEl.getBoundingClientRect().bottom);
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, topLimit, w, Math.max(0, h - topLimit));
+      ctx.clip();
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
@@ -1086,21 +1345,35 @@
         ctx.fillStyle = glow;
         ctx.fill();
       }
+      ctx.restore();
       requestAnimationFrame(tick);
     }
-    if (!prefersReducedMotion) tick();
+    if (!reduceMotion) tick();
   })();
 
-  /* КНИГА */
+  /* ============================================================
+     3. 3D КНИГА
+  ============================================================ */
   (function initBook() {
-    const pages = Array.prototype.slice.call(document.querySelectorAll(".page"));
-    const total = pages.length;
-    const bookSection = document.querySelector(".book-section");
+    const scaleEl  = document.getElementById("bookScale");
+    const shiftEl  = document.getElementById("bookShift");
+    const bookEl   = document.getElementById("book");
+    const viewport = document.getElementById("bookViewport");
+    const showcase = document.getElementById("showcase");
     const dotsWrap = document.getElementById("bookDots");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
+    const countEl  = document.getElementById("bookCount");
+    const prevBtn  = document.getElementById("prevBtn");
+    const nextBtn  = document.getElementById("nextBtn");
+    const pages    = Array.prototype.slice.call(document.querySelectorAll(".page"));
+    const total    = pages.length;
+
+    const SPREAD = { pw: 720, ph: 900, maxScale: 1.8 };
+    const SINGLE = { pw: 720, ph: 900, maxScale: 2.0  };
+    const SPREAD_MIN_WIDTH = 880;
+
     let current = 0;
-    const pageColors = pageFallbackColors.slice();
+    let spread = true;
+    let pw = SPREAD.pw;
 
     for (let i = 0; i < total; i++) {
       const b = document.createElement("button");
@@ -1112,71 +1385,158 @@
     }
     const dots = Array.prototype.slice.call(dotsWrap.children);
 
-    function applyColor(index, color) {
-      pageColors[index] = color;
-      if (index === current) {
-        bookSection.style.setProperty("--page-accent", color);
-      }
+    function layout() {
+      const cs = getComputedStyle(showcase);
+      const avail = showcase.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      spread = avail >= SPREAD_MIN_WIDTH;
+      const cfg = spread ? SPREAD : SINGLE;
+      pw = cfg.pw;
+      const logicalW = spread ? cfg.pw * 2 : cfg.pw;
+      const s = Math.min(cfg.maxScale, avail / logicalW);
+
+      scaleEl.style.width  = logicalW + "px";
+      scaleEl.style.height = cfg.ph + "px";
+      scaleEl.style.setProperty("--s", s.toFixed(4));
+      scaleEl.style.setProperty("--pw", cfg.pw + "px");
+      scaleEl.style.setProperty("--ph", cfg.ph + "px");
+      scaleEl.style.setProperty("--hinge", (spread ? cfg.pw : 0) + "px");
+      scaleEl.classList.toggle("spread", spread);
+      scaleEl.classList.toggle("single", !spread);
+      bookEl.style.setProperty("--ry", spread ? "0deg" : "-4deg");
+      viewport.style.height = Math.ceil(cfg.ph * s + 12) + "px";
+      render();
     }
-
-    function extractColor(index) {
-      const url = pageBackgrounds[index];
-      if (!url) { applyColor(index, pageFallbackColors[index]); return; }
-
-      const img = new Image();
-      img.onload = function () {
-        try {
-          const size = 24;
-          const c = document.createElement("canvas");
-          c.width = size; c.height = size;
-          const cctx = c.getContext("2d");
-          cctx.drawImage(img, 0, 0, size, size);
-          const data = cctx.getImageData(0, 0, size, size).data;
-          let r = 0, g = 0, b = 0, n = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            if (data[i + 3] < 200) continue;
-            r += data[i]; g += data[i + 1]; b += data[i + 2];
-            n++;
-          }
-          if (!n) throw new Error("no opaque pixels");
-          r = Math.round(r / n); g = Math.round(g / n); b = Math.round(b / n);
-          applyColor(index, "rgb(" + r + "," + g + "," + b + ")");
-        } catch (err) {
-          applyColor(index, pageFallbackColors[index]);
-        }
-      };
-      img.onerror = function () { applyColor(index, pageFallbackColors[index]); };
-      img.src = url;
-    }
-
-    for (let i = 0; i < total; i++) extractColor(i);
 
     function render() {
       pages.forEach(function (el, i) {
-        el.classList.toggle("flipped", i < current);
-        el.style.zIndex = i < current ? i : (total - i);
+        const flipped = i < current;
+        const z = flipped ? i * 2 : (total - i) * 2;
+        el.style.transform = "translateZ(" + z + "px) rotateY(" + (flipped ? -180 : 0) + "deg)";
+        el.classList.toggle("flipped", flipped);
+        el.setAttribute("aria-hidden", i === current ? "false" : "true");
       });
       dots.forEach(function (d, i) { d.classList.toggle("active", i === current); });
       prevBtn.disabled = current === 0;
       nextBtn.disabled = current === total - 1;
-      bookSection.style.setProperty("--page-accent", pageColors[current]);
+      countEl.textContent = (current + 1) + " / " + total;
+      scaleEl.classList.toggle("has-left", current > 0);
+      scaleEl.classList.toggle("at-end", current === total - 1);
+      shiftEl.style.transform = (spread && current === 0) ? "translateX(" + (-pw / 2) + "px)" : "translateX(0)";
     }
 
-    function goTo(index) {
-      current = Math.max(0, Math.min(total - 1, index));
+    function goTo(i) {
+      current = Math.max(0, Math.min(total - 1, i));
       render();
     }
 
     prevBtn.addEventListener("click", function () { goTo(current - 1); });
     nextBtn.addEventListener("click", function () { goTo(current + 1); });
 
-    document.querySelector(".book-section").addEventListener("keydown", function (e) {
+    let inView = false;
+    new IntersectionObserver(function (e) { inView = e[0].isIntersecting; }, { threshold: 0.35 }).observe(showcase);
+    document.addEventListener("keydown", function (e) {
+      if (!inView) return;
       if (e.key === "ArrowRight") goTo(current + 1);
-      if (e.key === "ArrowLeft") goTo(current - 1);
+      if (e.key === "ArrowLeft")  goTo(current - 1);
     });
-    render();
+
+    let sx = 0, sy = 0;
+    viewport.addEventListener("pointerdown", function (e) { if (e.pointerType === "touch") { sx = e.clientX; sy = e.clientY; } });
+    viewport.addEventListener("pointerup", function (e) {
+      if (e.pointerType !== "touch") return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(current + (dx < 0 ? 1 : -1));
+    });
+
+    if (finePointer && !reduceMotion) {
+      showcase.addEventListener("mousemove", function (e) {
+        const r = bookEl.getBoundingClientRect();
+        const px = (e.clientX - (r.left + r.width / 2)) / window.innerWidth;
+        const py = (e.clientY - (r.top + r.height / 2)) / window.innerHeight;
+        bookEl.style.setProperty("--rx", (4 - py * 6).toFixed(2) + "deg");
+        bookEl.style.setProperty("--ry", ((spread ? 0 : -4) + px * 8).toFixed(2) + "deg");
+      });
+      showcase.addEventListener("mouseleave", function () {
+        bookEl.style.setProperty("--rx", "4deg");
+        bookEl.style.setProperty("--ry", spread ? "0deg" : "-4deg");
+      });
+    }
+
+    if ("ResizeObserver" in window) new ResizeObserver(layout).observe(showcase);
+    else window.addEventListener("resize", layout);
+    layout();
   })();
 
+  /* ============================================================
+     4. ПОДСВЕТКА МЕНЮ
+  ============================================================ */
+  (function initNav() {
+    const links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+    const map = {};
+    links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting && map[en.target.id]) {
+          links.forEach(function (l) { l.classList.remove("active"); });
+          map[en.target.id].classList.add("active");
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    Object.keys(map).forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+  })();
+
+  /* ============================================================
+     5. БОКОВЫЕ ТЕРМИНАЛЫ СТАТИСТИКИ
+  ============================================================ */
+  (function initSidePanels() {
+    const leftPanel = document.getElementById("panelLeft");
+    const rightPanel = document.getElementById("panelRight");
+    if (!leftPanel || !rightPanel) return;
+    const sections = Array.prototype.slice.call(document.querySelectorAll("header, section, footer"));
+
+    function getActiveSection() {
+      const scrollMid = window.scrollY + window.innerHeight / 3;
+      for (let i = 0; i < sections.length; i++) {
+        const sec = sections[i];
+        if (scrollMid >= sec.offsetTop && scrollMid < sec.offsetTop + sec.offsetHeight) {
+          return sec.id ? "#" + sec.id : sec.tagName.toLowerCase();
+        }
+      }
+      return "#hero";
+    }
+
+    function updatePanels() {
+      const scrollTop = Math.round(window.scrollY);
+      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      const filled = Math.round(progress / 10);
+      const bar = "[" + "█".repeat(filled) + "░".repeat(10 - filled) + "]";
+      const hexAddr = "0x" + (scrollTop * 16 + 4096).toString(16).toUpperCase();
+
+      leftPanel.innerHTML =
+        '<div class="sp-title"><span>&gt; SCROLL_LOG</span><span class="status-pulse"></span></div>' +
+        '<div><span class="sp-k">pos_y:</span> <span class="sp-v">' + scrollTop + 'px</span></div>' +
+        '<div><span class="sp-k">depth:</span> <span class="sp-v">' + progress.toFixed(1) + '%</span></div>' +
+        '<div class="sp-bar">' + bar + '</div>' +
+        '<div><span class="sp-k">node:</span> <span class="sp-v">' + getActiveSection() + '</span></div>' +
+        '<div><span class="sp-k">view_h:</span> <span class="sp-v">' + window.innerHeight + 'px</span></div>';
+
+      rightPanel.innerHTML =
+        '<div class="sp-title"><span>&gt; SYS_METRICS</span></div>' +
+        '<div><span class="sp-k">status:</span> <span class="sp-v">ONLINE</span></div>' +
+        '<div><span class="sp-k">mem_addr:</span> <span class="sp-v">' + hexAddr + '</span></div>' +
+        '<div><span class="sp-k">stack:</span> <span class="sp-v">Python/JS</span></div>' +
+        '<div><span class="sp-k">res:</span> <span class="sp-v">' + window.innerWidth + 'x' + window.innerHeight + '</span></div>' +
+        '<div class="sp-foot">LATENCY: ' + (10 + (scrollTop % 9)) + 'ms<br>ENGINE: V8_READY</div>';
+    }
+
+    window.addEventListener("scroll", updatePanels, { passive: true });
+    window.addEventListener("resize", updatePanels, { passive: true });
+    updatePanels();
+  })();
 })();
 </script>
 </body>
