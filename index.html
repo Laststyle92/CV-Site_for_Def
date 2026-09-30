@@ -1404,16 +1404,15 @@
     const total    = pages.length;
 
     // Определяем, мобильное ли устройство
-    const isMobile = window.innerWidth <= 768;
+ const isMobile = window.innerWidth <= 768;
 
-let pageText = "Ваш исходный большой текст книги...";
+let pageText = "Ваш текст книги...";
 
 if (isMobile) {
-  // Оставляем только первые 30% символов текста
-  const length30Percent = Math.floor(pageText.length * 0.3);
-  pageText = pageText.substring(0, length30Percent) + '... <br><b>(Текст сокращен для мобильной версии)</b>';
+  // Оставляем 50% символов текста
+  const length50Percent = Math.floor(pageText.length * 0.5);
+  pageText = pageText.substring(0, length50Percent) + '...';
 }
-
     // На телефоне уменьшаем ширину под размер экрана, а высоту считаем пропорционально
     const mobileWidth = isMobile ? Math.min(window.innerWidth - 32, 400) : 720;
     const mobileHeight = isMobile ? Math.round(mobileWidth * 1.25) : 900;
