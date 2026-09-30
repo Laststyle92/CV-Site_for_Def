@@ -631,6 +631,21 @@
   .dot.active { width: 24px; background: var(--paper); }
   .book-count { font-size: 12px; color: var(--fog); min-width: 44px; text-align: center; }
 
+  /* Адаптация для большого объема текста на мобильных в портретном режиме */
+  @media (max-width: 768px) and (orientation: portrait) {
+    .page, .page-front, .page-back, .book-page {
+      font-size: 14px !important;       /* Уменьшаем размер текста для компактности */
+      line-height: 1.4 !important;      /* Оптимизируем межстрочный интервал */
+      padding: 12px !important;         /* Уменьшаем внутренние отступы страниц */
+    }
+
+    /* Включаем прокрутку внутри страницы книги, если текст всё равно не влезает */
+    .page-front, .page-back {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+    }
+  }
+
   /* ============================================================
      6. ОБО МНЕ
   ============================================================ */
