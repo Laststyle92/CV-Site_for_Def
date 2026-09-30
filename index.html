@@ -800,19 +800,17 @@
     .status-pulse { animation: none; }
   }
   /* --- Оптимизация книги только для телефонов --- */
-  @media (max-width: 768px) {
-    .page, .page-front, .page-back, .page-element {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      will-change: transform;
+
+  @media (max-width: 768px) and (orientation: portrait) {
+    .book-page, .page, .page-front, .page-back, .page-element {
+      box-shadow: none !important;       /* Убираем тяжелые тени, перегружающие память телефона */
+      text-shadow: none !important;
+      backdrop-filter: none !important;  /* Отключаем тяжелые размытия подложки */
     }
-    .book-container, .book-shift {
-      perspective: 1000px;
-    }
-    .book-page {
-      transition: transform 0.25s ease-out !important;
+    
+    /* Упрощаем отрисовку текста для мобильного процессора */
+    .book-container {
+      -webkit-font-smoothing: antialiased;
     }
   }
 </style>
