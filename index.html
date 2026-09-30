@@ -799,6 +799,22 @@
     .page, .book-shift, .book { transition-duration: .01s !important; }
     .status-pulse { animation: none; }
   }
+  /* --- Оптимизация книги только для телефонов --- */
+  @media (max-width: 768px) {
+    .page, .page-front, .page-back, .page-element {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      will-change: transform;
+    }
+    .book-container, .book-shift {
+      perspective: 1000px;
+    }
+    .book-page {
+      transition: transform 0.25s ease-out !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1448,7 +1464,8 @@
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(current + (dx < 0 ? 1 : -1));
     });
 
-    if (finePointer && !reduceMotion) {
+    // Эффект наклона от мыши работает ТОЛЬКО на ПК, на телефонах он отключен во избежание лагов
+    if (finePointer && !reduceMotion && window.innerWidth > 768) {
       showcase.addEventListener("mousemove", function (e) {
         const r = bookEl.getBoundingClientRect();
         const px = (e.clientX - (r.left + r.width / 2)) / window.innerWidth;
