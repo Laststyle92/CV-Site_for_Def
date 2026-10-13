@@ -4,88 +4,116 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#08090a">
+<meta name="theme-color" content="#05060f">
 <title>Резюме — Альминов Руслан Константинович</title>
 <meta name="description" content="Резюме и портфолио — Альминов Руслан Константинович">
+<script>document.documentElement.classList.add("js");</script>
 
 <!--
 ================================================================================
   КАК УСТРОЕН ЭТОТ ФАЙЛ (читайте перед редактированием)
 ================================================================================
-  Дизайн — по DESIGN.md (Linear: «midnight precision instrument»).
-  Все цвета, шрифты, радиусы и отступы лежат в :root (дизайн-токены).
+  Дизайн — по Style Reference «AuthKit — Frosted glass cathedral at midnight».
+  Все цвета, шрифты, радиусы, тени и отступы лежат в :root (дизайн-токены).
 
-  1. <style> — стили: токены, курсор, частицы, навигация, hero, 3D-книга, контакты.
+  1. <style> — стили: токены, фон (сетка + прожектор + свечения), курсор,
+     навигация, hero (вордмарк + стеклянные карточки), инструменты,
+     3D-книга, обо мне, навыки, образование, контакты, боковые панели.
   2. <body> — разметка:
-       - холсты курсора (#cursorCanvas) и частиц (#bgCanvas)
+       - фоновые слои: сетка (.bg-grid), свечения, холсты (#gridCanvas, #bgCanvas)
+       - холст курсора (#cursorCanvas)
        - боковые панели статистики
        - верхняя навигация
-       - шапка (hero) + полоса инструментов
+       - шапка (hero) + веер стеклянных карточек + ряд инструментов
        - секция "Опыт работы" (3D-книга)
        - секция "Обо мне"
        - секция "Навыки"
        - секция "Образование и сертификаты"
        - секция "Контакты" (Email, Telegram, GitHub, Локация)
        - подвал
-  3. <script> — логика: курсор, частицы фона, книга, подсветка меню, боковые панели.
+  3. <script> — логика: курсор, сигналы по сетке, частицы, книга,
+     подсветка меню, появление блоков, боковые панели.
+
+  Шрифты (замены из гайда): Untitled Sans → Inter, dotDigital → JetBrains Mono,
+  aeonikPro → Manrope (Space Grotesk не поддерживает кириллицу).
 ================================================================================
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Manrope:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
   /* ============================================================
-     1. ДИЗАЙН-ТОКЕНЫ
+     1. ДИЗАЙН-ТОКЕНЫ (AuthKit)
   ============================================================ */
   :root {
-    --void: #08090a;
-    --carbon: #0f1011;
-    --obsidian: #161718;
-    --graphite: #23252a;
-    --smoke: #383b3f;
-    --ash: #62666d;
-    --fog: #8a8f98;
-    --mist: #d0d6e0;
-    --bone: #e5e5e6;
-    --paper: #ffffff;
-    --lime: #e4f222;
-    --green: #27a644;
-    --coral: #eb5757;
-    --teal: #02b8cc;
-    --iris: #6366f1;
-    --lavender: #8b5cf6;
+    /* Colors */
+    --color-midnight-canvas: #05060f;
+    --color-steel-plate: #2f343e;
+    --color-fog-veil: #9da7ba;
+    --color-moon-mist: #c7d3ea;
+    --color-frost-glow: #d1e4fa;
+    --color-ice-highlight: #d8ecf8;
+    --gradient-ice-highlight: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
+    --color-pure-white: #ffffff;
+    --color-void-violet: #663af3;
+    --color-blueprint-blue: #b6d9fc;
+    --color-gridline-blue: #3f4959;
+    --color-glass-edge: #bad7f71f;
+    --color-luminous-fill: #c7d3ea1f;
 
-    --font-ui: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --font-mono: 'Berkeley Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    /* Typography */
+    --font-untitled-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-aeonikpro: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-dotdigital: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-    --r-card: 12px;
-    --r-btn: 6px;
-    --r-badge: 4px;
-    --r-pill: 9999px;
-
-    --hairline: inset 0 0 0 1px var(--graphite);
-    --container: 1200px;
+    /* Layout */
+    --page-max-width: 1200px;
+    --section-gap: clamp(80px, 11vw, 120px);
+    --card-padding: 24px;
+    --element-gap: 16px;
     --gutter: clamp(20px, 4vw, 48px);
-    --section-gap: clamp(64px, 9vw, 96px);
+
+    /* Radius */
+    --radius-cards: 16px;
+    --radius-badges: 6px;
+    --radius-inputs: 6px;
+    --radius-buttons: 999px;
+    --radius-iconcontainers: 9999px;
+
+    /* Shadows */
+    --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;
+    --shadow-md: rgba(238, 186, 247, 0.24) 0px 0px 12px 0px;
+    --shadow-subtle: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
+    --shadow-subtle-2: rgba(199, 211, 234, 0.12) -0.5px 0.5px 1px 0px inset, rgba(186, 215, 247, 0.08) 0px 0px 96px 0px inset;
+    --shadow-subtle-3: rgba(186, 214, 247, 0.06) 0px 0px 0px 1px inset;
+    --shadow-subtle-4: rgba(199, 211, 234, 0.12) 0px 1px 1px 0px inset, rgba(199, 211, 234, 0.05) 0px 24px 48px 0px inset, rgba(6, 6, 14, 0.7) 0px 24px 32px 0px;
+    --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
+    --shadow-subtle-8: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(199, 211, 234, 0.08) 0px 0px 0px 1px inset;
+    --shadow-subtle-9: rgba(186, 214, 247, 0.24) 0px 0px 0px 1px inset;
+
+    /* Surfaces */
+    --surface-frosted-glass: rgba(186, 214, 247, 0.03);
+    --surface-deep-glass: rgba(5, 6, 15, 0.97);
+
+    --hairline: rgba(186, 215, 247, 0.12);
     --ease: cubic-bezier(.5, .05, .15, 1);
   }
 
   /* ============================================================
-     2. БАЗА И ХОЛСТЫ
+     2. БАЗА
   ============================================================ */
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: var(--void);
-    color: var(--mist);
-    font-family: var(--font-ui);
-    font-feature-settings: "cv01" on, "ss03" on, "zero" on;
+    background: var(--color-midnight-canvas);
+    color: var(--color-frost-glow);
+    font-family: var(--font-untitled-sans);
     font-size: 16px;
     line-height: 1.5;
-    font-weight: 400;
+    letter-spacing: -0.01em;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -95,10 +123,64 @@
   button { font-family: inherit; color: inherit; }
   h1, h2, h3, h4, p, ul { margin: 0; }
   ul { padding: 0; list-style: none; }
-  h1, h2, h3, h4 { color: var(--paper); font-weight: 510; }
+  h1, h2, h3, h4 { color: var(--color-ice-highlight); font-weight: 500; }
 
-  ::selection { background: var(--lime); color: var(--void); }
-  :focus-visible { outline: 2px solid var(--mist); outline-offset: 3px; border-radius: var(--r-btn); }
+  ::selection { background: var(--color-void-violet); color: var(--color-pure-white); }
+  :focus-visible { outline: 2px solid var(--color-blueprint-blue); outline-offset: 3px; border-radius: 6px; }
+
+  .container {
+    width: 100%;
+    max-width: var(--page-max-width);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  main, header, footer { position: relative; z-index: 2; }
+
+  /* ============================================================
+     3. ФОН: СЕТКА-ЧЕРТЁЖ, ПРОЖЕКТОР, СВЕЧЕНИЯ, ЧАСТИЦЫ
+  ============================================================ */
+  .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+  /* Сетка 1px / 80px, маска затухает к краям */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(186, 215, 247, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(186, 215, 247, 0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+    background-position: 0 0;
+  }
+  .bg-mask {
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 35%, #000 35%, transparent 100%);
+            mask-image: radial-gradient(ellipse 75% 70% at 50% 35%, #000 35%, transparent 100%);
+  }
+
+  /* Мягкие холодные свечения, медленно плавают */
+  .bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .55;
+    will-change: transform;
+  }
+  .bg-glow.g1 {
+    width: 46vw; height: 46vw; left: -12vw; top: 30vh;
+    background: radial-gradient(circle, rgba(124, 145, 182, 0.22), transparent 70%);
+    animation: drift1 28s ease-in-out infinite alternate;
+  }
+  .bg-glow.g2 {
+    width: 40vw; height: 40vw; right: -10vw; top: 55vh;
+    background: radial-gradient(circle, rgba(152, 192, 239, 0.16), transparent 70%);
+    animation: drift2 34s ease-in-out infinite alternate;
+  }
+  .bg-glow.g3 {
+    width: 30vw; height: 30vw; left: 35vw; top: 110vh;
+    background: radial-gradient(circle, rgba(102, 58, 243, 0.10), transparent 70%);
+    animation: drift1 40s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift1 { from { transform: translate(0, 0) scale(1); } to { transform: translate(8vw, -12vh) scale(1.15); } }
+  @keyframes drift2 { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-10vw, -8vh) scale(.95); } }
+
+  #gridCanvas, #bgCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
   /* Холст курсора */
   #cursorCanvas {
@@ -118,298 +200,447 @@
     }
   }
 
-  /* Холст фоновых частиц */
-  #bgCanvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
+  /* ============================================================
+     4. ОБЩИЕ КОМПОНЕНТЫ
+  ============================================================ */
+  /* Eyebrow: капс-метка с затухающими линиями */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: var(--font-dotdigital);
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-feature-settings: "tnum" on;
+    color: var(--color-moon-mist);
+  }
+  .eyebrow::before, .eyebrow::after {
+    content: "";
+    height: 1px;
+    width: min(120px, 16vw);
+    flex: none;
+  }
+  .eyebrow::before { background: linear-gradient(90deg, transparent, var(--hairline)); }
+  .eyebrow::after  { background: linear-gradient(90deg, var(--hairline), transparent); }
+
+  /* Градиентный текст (Skywash) — только вордмарк и крупные заголовки */
+  .skywash {
+    background: var(--gradient-ice-highlight);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
-  .container {
-    width: 100%;
-    max-width: var(--container);
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-  }
-  main, header, footer { position: relative; z-index: 1; }
-
-  .h-section {
-    font-size: clamp(32px, 4.4vw, 48px);
-    line-height: 1;
-    letter-spacing: -0.022em;
-    font-weight: 510;
-  }
-  .section { padding-top: var(--section-gap); scroll-margin-top: 56px; }
-
+  .section { padding-top: var(--section-gap); scroll-margin-top: 72px; }
   .section-head {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px 48px;
-    flex-wrap: wrap;
-    margin-bottom: clamp(28px, 4vw, 48px);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    margin-bottom: clamp(36px, 5vw, 56px);
+  }
+  .h-section {
+    font-family: var(--font-aeonikpro);
+    font-size: clamp(32px, 4.4vw, 48px);
+    line-height: 1.17;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
   .section-note {
-    color: var(--fog);
-    font-size: 15px;
-    line-height: 1.6;
-    letter-spacing: -0.011em;
-    max-width: 38ch;
+    color: var(--color-moon-mist);
+    font-size: clamp(16px, 1.6vw, 18px);
+    line-height: 1.5;
+    max-width: 640px;
   }
 
-  /* Карточки и кнопки */
+  /* Стеклянная карточка */
   .card {
-    background: var(--carbon);
-    border-radius: var(--r-card);
-    box-shadow: var(--hairline);
-    padding: 24px;
-    transition: box-shadow .25s ease;
+    position: relative;
+    background: var(--surface-frosted-glass);
+    border-radius: var(--radius-cards);
+    box-shadow: var(--shadow-subtle-4), var(--shadow-subtle-3);
+    padding: var(--card-padding);
+    transition: box-shadow .35s ease, transform .35s var(--ease), background .35s ease;
   }
-  .card:hover { box-shadow: inset 0 0 0 1px var(--smoke); }
+  .card:hover {
+    background: rgba(186, 214, 247, 0.05);
+    box-shadow: var(--shadow-subtle-4), var(--shadow-subtle-9);
+  }
 
+  /* Кнопки-пилюли */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border-radius: var(--r-btn);
+    border-radius: var(--radius-buttons);
     font-size: 14px;
-    font-weight: 510;
-    letter-spacing: -0.011em;
-    cursor: pointer;
+    font-weight: 500;
+    line-height: 1.43;
+    padding: 8px 16px;
     border: 0;
-    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+    transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
   }
-  .btn-primary {
-    background: var(--lime);
-    color: var(--void);
-    padding: 10px 16px;
-    box-shadow: rgba(0,0,0,.01) 0 5px 2px, rgba(0,0,0,.04) 0 3px 2px, rgba(0,0,0,.07) 0 1px 1px;
+  .btn svg { width: 14px; height: 14px; }
+  .btn-ghost {
+    background: rgba(186, 214, 247, 0.06);
+    color: var(--color-pure-white);
+    box-shadow: var(--shadow-subtle);
   }
-  .btn-primary:hover { transform: translateY(-1px); background: #ecf84a; }
-  .btn-primary svg { width: 14px; height: 14px; }
+  .btn-ghost:hover { background: rgba(186, 214, 247, 0.12); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--color-frost-glow);
+    box-shadow: var(--shadow-subtle);
+  }
+  .btn-outline:hover { background: rgba(186, 214, 247, 0.06); color: var(--color-pure-white); }
+  .btn-lg { padding: 12px 22px; font-size: 15px; }
+
+  /* Фиолетовая CTA — только в форме-макете */
+  .btn-violet {
+    width: 100%;
+    background: var(--color-void-violet);
+    color: var(--color-pure-white);
+    border-radius: var(--radius-inputs);
+    padding: 12px 24px;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 8px 24px -8px rgba(102, 58, 243, .6);
+  }
+  .btn-violet:hover { background: #7449f6; transform: translateY(-1px); }
 
   .badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(255,255,255,.05);
-    color: var(--fog);
-    border-radius: var(--r-badge);
-    padding: 2px 8px;
+    background: rgba(199, 211, 234, 0.12);
+    color: var(--color-frost-glow);
+    border-radius: var(--radius-badges);
+    padding: 4px 8px;
     font-size: 12px;
-    line-height: 1.4;
+    line-height: 1.33;
+    font-weight: 500;
+    box-shadow: rgba(199, 211, 234, 0.12) 0 1px 1px inset, rgba(186, 215, 247, 0.06) 0 0 12px inset;
   }
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,255,255,.05);
-    color: var(--mist);
-    border-radius: var(--r-pill);
-    padding: 4px 12px;
-    font-size: 13px;
+  .mono { font-family: var(--font-dotdigital); letter-spacing: 0.02em; }
+
+  .icon-tile {
+    width: 56px; height: 56px;
+    flex: none;
+    border-radius: var(--radius-iconcontainers);
+    background: rgba(186, 214, 247, 0.06);
+    box-shadow: var(--shadow-subtle-8);
+    display: grid;
+    place-items: center;
+    color: var(--color-frost-glow);
   }
-  .mono { font-family: var(--font-mono); letter-spacing: -0.013em; }
+  .icon-tile svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Появление при прокрутке */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .js .reveal.in { opacity: 1; transform: none; }
 
   /* ============================================================
-     3. НАВИГАЦИЯ
+     5. НАВИГАЦИЯ
   ============================================================ */
   .nav {
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
-    height: 56px;
-    background: rgba(8, 9, 10, .72);
-    backdrop-filter: blur(16px) saturate(1.4);
-    -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    box-shadow: 0 1px 0 var(--graphite);
+    height: 64px;
+    background: rgba(5, 6, 15, 0.6);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    box-shadow: 0 1px 0 rgba(186, 215, 247, 0.08);
   }
-  .nav-inner {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
+  .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .brandmark {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     font-size: 16px;
-    font-weight: 510;
-    letter-spacing: -0.011em;
-    color: var(--paper);
-    min-width: 0;
+    font-weight: 500;
+    color: var(--color-frost-glow);
     white-space: nowrap;
   }
-  .brandmark svg { width: 18px; height: 18px; flex: none; }
-  .brandmark span { color: var(--paper); }
-  .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; margin-right: 16px; }
+  .brandmark svg { width: 20px; height: 20px; flex: none; filter: drop-shadow(0 0 6px rgba(186, 207, 247, .4)); }
+  .nav-links { display: flex; align-items: center; gap: 2px; margin-left: auto; margin-right: 12px; }
   .nav-links a {
-    padding: 8px 12px;
-    font-size: 13px;
-    color: var(--mist);
-    border-radius: var(--r-btn);
-    transition: color .2s ease, background .2s ease;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--color-fog-veil);
+    border-radius: var(--radius-buttons);
+    transition: color .2s ease, background .2s ease, box-shadow .2s ease;
   }
-  .nav-links a:hover { color: var(--paper); background: rgba(255,255,255,.05); }
-  .nav-links a.active { color: var(--paper); box-shadow: inset 0 -1px 0 var(--paper); border-radius: 0; }
-  .nav-cta {
-    flex: none;
-    background: var(--paper);
-    color: var(--void);
-    padding: 8px 16px;
-    border-radius: var(--r-pill);
-    font-size: 13px;
-    font-weight: 510;
-    transition: background .2s ease, transform .2s ease;
-  }
-  .nav-cta:hover { background: var(--bone); transform: translateY(-1px); }
-  @media (max-width: 900px) { .nav-links { display: none; } }
+  .nav-links a:hover { color: var(--color-pure-white); background: rgba(186, 214, 247, 0.06); }
+  .nav-links a.active { color: var(--color-pure-white); background: rgba(186, 214, 247, 0.06); box-shadow: var(--shadow-subtle); }
+  @media (max-width: 960px) { .nav-links { display: none; } }
 
   /* ============================================================
-     4. HERO И ПОЛОСА ИНСТРУМЕНТОВ
+     6. HERO
   ============================================================ */
   .hero {
     position: relative;
-    padding: clamp(112px, 14vw, 152px) 0 clamp(56px, 7vw, 88px);
-    overflow: hidden;
+    padding: clamp(120px, 15vw, 168px) 0 0;
+    text-align: center;
   }
-  .hero::before {
-    content: "";
+  /* Конический прожектор сверху */
+  .spotlight {
     position: absolute;
     left: 50%;
-    bottom: -38%;
-    width: min(1400px, 140vw);
-    height: 70%;
+    top: -64px;
+    width: min(1600px, 180vw);
+    height: 1100px;
     transform: translateX(-50%);
-    background: radial-gradient(ellipse at center, rgba(208,214,224,.14), transparent 68%);
     pointer-events: none;
+    z-index: 0;
   }
-  .hero-grid {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
-    gap: clamp(32px, 6vw, 80px);
-    align-items: center;
+  .spotlight .beam {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(at 50% -5%, transparent 45%, rgba(124, 145, 182, 0.3) 49%, rgba(124, 145, 182, 0.5) 50%, rgba(124, 145, 182, 0.3) 51%, transparent 55%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.6) 45%, transparent 85%);
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.6) 45%, transparent 85%);
+    filter: blur(14px);
+    transform-origin: 50% 0;
+    animation: beam 9s ease-in-out infinite;
   }
-  .hero-eyebrow-role { margin-bottom: 24px; }
+  .spotlight .beam.wide {
+    background: conic-gradient(at 50% -5%, transparent 40%, rgba(124, 145, 182, 0.10) 46%, rgba(152, 192, 239, 0.16) 50%, rgba(124, 145, 182, 0.10) 54%, transparent 60%);
+    filter: blur(30px);
+    animation: beamWide 13s ease-in-out infinite;
+  }
+  .spotlight .halo {
+    position: absolute;
+    left: 50%; top: 0;
+    width: 900px; height: 520px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(124, 145, 182, 0.35), rgba(124, 145, 182, 0.08) 45%, transparent 70%);
+    animation: halo 9s ease-in-out infinite;
+  }
+  @keyframes beam     { 0%, 100% { opacity: .8; transform: scaleX(1); } 50% { opacity: 1; transform: scaleX(1.18); } }
+  @keyframes beamWide { 0%, 100% { opacity: .7; transform: scaleX(1.1) rotate(-1deg); } 50% { opacity: 1; transform: scaleX(.9) rotate(1deg); } }
+  @keyframes halo     { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+
+  .hero-inner { position: relative; z-index: 1; }
   .hero h1 {
-    font-size: clamp(44px, 7.2vw, 72px);
-    line-height: 1;
-    letter-spacing: -0.022em;
-    max-width: 11ch;
+    margin: 28px auto 0;
+    font-family: var(--font-aeonikpro);
+    font-weight: 500;
+    font-size: clamp(48px, 9.5vw, 136px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    max-width: 12ch;
+    filter: drop-shadow(0 0 6px rgba(186, 207, 247, 0.32)) drop-shadow(0 0 12px rgba(238, 186, 247, 0.24));
+    padding-bottom: .06em;
   }
   .hero-lead {
-    margin-top: 28px;
-    font-size: clamp(17px, 2vw, 20px);
+    margin: 28px auto 0;
+    font-size: clamp(17px, 2vw, 22px);
     line-height: 1.33;
-    letter-spacing: -0.012em;
-    font-weight: 510;
-    color: var(--paper);
-    max-width: 34ch;
+    font-weight: 500;
+    color: var(--color-frost-glow);
+    max-width: 40ch;
   }
   .hero-intro {
-    margin-top: 16px;
-    max-width: 60ch;
+    margin: 16px auto 0;
+    max-width: 640px;
     font-size: 16px;
     line-height: 1.6;
-    color: var(--fog);
+    color: var(--color-fog-veil);
   }
-  .hero-actions { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .hero-actions { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 
-  .photo-frame {
+  /* Веер стеклянных карточек */
+  .fan {
     position: relative;
-    background: var(--carbon);
-    border-radius: var(--r-card);
-    box-shadow: var(--hairline), rgba(8,9,10,.6) 0 4px 32px;
-    padding: 12px;
-    max-width: 360px;
-    justify-self: end;
-    width: 100%;
+    max-width: 1040px;
+    height: 560px;
+    margin: clamp(56px, 7vw, 88px) auto 0;
+    text-align: left;
   }
-  .photo-bar { display: flex; gap: 6px; padding: 2px 4px 12px; }
-  .photo-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--graphite); }
+  .fan-slot { position: absolute; }
+  .fan-slot.left   { left: 0;   top: 70px; width: 320px; transform: rotate(-7deg); z-index: 1; }
+  .fan-slot.center { left: 50%; top: 0;    width: 340px; transform: translateX(-50%); z-index: 3; }
+  .fan-slot.right  { right: 0;  top: 70px; width: 320px; transform: rotate(7deg); z-index: 1; }
+  .fan-slot.left .auth-card, .fan-slot.right .auth-card { opacity: .92; }
+
+  .auth-card {
+    background: var(--surface-deep-glass);
+    border-radius: var(--radius-cards);
+    box-shadow: var(--shadow-subtle-6), var(--shadow-subtle-3);
+    padding: 28px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fan-slot .auth-card { animation: float 7s ease-in-out infinite; }
+    .fan-slot.left .auth-card  { animation-delay: -2.3s; }
+    .fan-slot.right .auth-card { animation-delay: -4.6s; }
+  }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  .auth-logo {
+    width: 40px; height: 40px;
+    margin: 0 auto 18px;
+    border-radius: var(--radius-iconcontainers);
+    display: grid; place-items: center;
+    background: rgba(186, 214, 247, 0.06);
+    box-shadow: var(--shadow-subtle-8);
+    color: var(--color-frost-glow);
+  }
+  .auth-logo svg { width: 18px; height: 18px; }
+  .auth-title { text-align: center; font-size: 18px; line-height: 1.33; font-weight: 600; color: var(--color-pure-white); }
+  .auth-sub { margin-top: 6px; text-align: center; font-size: 13px; line-height: 1.45; color: var(--color-fog-veil); }
+
   .photo-screen {
     position: relative;
+    margin-top: 18px;
     aspect-ratio: 4 / 5;
-    border-radius: var(--r-btn);
+    border-radius: 12px;
     overflow: hidden;
-    background: linear-gradient(160deg, var(--obsidian), var(--carbon));
-    box-shadow: var(--hairline);
+    background: linear-gradient(160deg, #0d1020, #05060f);
+    box-shadow: var(--shadow-subtle);
   }
   .photo-screen img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-screen::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(5, 6, 15, .55));
+    pointer-events: none;
+  }
   .photo-mono {
     position: absolute; inset: 0;
     display: none;
     place-items: center;
+    font-family: var(--font-aeonikpro);
     font-size: 72px;
-    letter-spacing: -0.022em;
-    font-weight: 510;
-    color: var(--smoke);
+    font-weight: 500;
+    color: var(--color-gridline-blue);
   }
   .photo-screen.no-photo img { display: none; }
   .photo-screen.no-photo .photo-mono { display: grid; }
 
-  @media (max-width: 860px) {
-    .hero-grid { grid-template-columns: 1fr; }
-    .photo-frame { justify-self: start; max-width: 280px; order: -1; }
-    .hero h1 { max-width: none; }
+  .field-label { display: block; margin: 20px 0 6px; font-size: 12px; line-height: 1.33; color: var(--color-moon-mist); }
+  .field {
+    display: block;
+    width: 100%;
+    background: rgba(199, 211, 234, 0.06);
+    color: var(--color-pure-white);
+    border-radius: var(--radius-inputs);
+    padding: 10px;
+    font-size: 14px;
+    box-shadow: var(--shadow-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: box-shadow .2s ease;
+  }
+  .field:hover { box-shadow: var(--shadow-subtle-9); }
+  .auth-card .btn-violet { margin-top: 14px; }
+  .divider-or {
+    display: flex; align-items: center; gap: 12px;
+    margin: 18px 0;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-fog-veil);
+  }
+  .divider-or::before, .divider-or::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+  .provider {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--radius-buttons);
+    background: rgba(199, 211, 234, 0.06);
+    box-shadow: var(--shadow-subtle);
+    color: var(--color-pure-white);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background .2s ease;
+  }
+  .provider + .provider { margin-top: 10px; }
+  .provider:hover { background: rgba(199, 211, 234, 0.12); }
+  .provider svg { width: 16px; height: 16px; flex: none; color: var(--color-frost-glow); }
+
+  .stack-badges { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .mini-list { margin-top: 20px; display: grid; gap: 10px; }
+  .mini-list li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--color-moon-mist);
+  }
+  .mini-list li::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none;
+    background: var(--color-blueprint-blue);
+    box-shadow: 0 0 8px rgba(182, 217, 252, .8);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-text > *, .photo-frame { animation: rise .8s var(--ease) both; }
-    .hero-text > *:nth-child(2) { animation-delay: .06s; }
-    .hero-text > *:nth-child(3) { animation-delay: .12s; }
-    .hero-text > *:nth-child(4) { animation-delay: .18s; }
-    .hero-text > *:nth-child(5) { animation-delay: .24s; }
-    .photo-frame { animation-delay: .15s; }
+  @media (max-width: 960px) {
+    .fan { height: auto; display: grid; gap: 20px; justify-items: center; }
+    .fan-slot { position: relative; inset: auto !important; transform: none !important; width: min(360px, 100%) !important; }
+    .fan-slot.center { order: -1; }
+    .fan-slot.left .auth-card, .fan-slot.right .auth-card { opacity: 1; }
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
-  .tools {
-    position: relative;
-    z-index: 2;
-    background: var(--void);
-    padding: 28px 0;
-    box-shadow: 0 -1px 0 var(--graphite), 0 1px 0 var(--graphite);
-  }
+  /* Ряд инструментов: круглые плитки с соединительной линией */
+  .tools { margin-top: clamp(72px, 9vw, 112px); }
   .tools-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 14px 40px;
-    color: var(--fog);
-    font-size: 15px;
-    font-weight: 510;
-    letter-spacing: -0.011em;
+    position: relative;
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 24px 8px;
+  }
+  .tools-row::before {
+    content: "";
+    position: absolute;
+    left: 6%; right: 6%; top: 28px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--hairline) 10%, var(--hairline) 90%, transparent);
+  }
+  .tools-row::after {
+    content: "";
+    position: absolute;
+    top: 27px; left: 6%;
+    width: 120px; height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent, rgba(182, 217, 252, .9), transparent);
+    filter: blur(1px);
+    animation: run 6s linear infinite;
+  }
+  @keyframes run { from { transform: translateX(-120px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { transform: translateX(calc(min(1104px, 88vw) - 120px)); opacity: 0; } }
+  .tool { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+  .tool .icon-tile { position: relative; background: #0a0c18; transition: transform .3s var(--ease), box-shadow .3s ease; }
+  .tool:hover .icon-tile { transform: translateY(-3px); box-shadow: var(--shadow-subtle-8), var(--shadow-sm), var(--shadow-md); }
+  .tool span { font-size: 14px; line-height: 1.43; color: var(--color-moon-mist); }
+  @media (max-width: 860px) {
+    .tools-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .tools-row::before, .tools-row::after { display: none; }
   }
 
   /* ============================================================
-     5. КНИГА ОПЫТА (3D flipbook С РАЗМЫТЫМИ ФОТО)
+     7. КНИГА ОПЫТА (3D flipbook С РАЗМЫТЫМИ ФОТО)
   ============================================================ */
   .showcase {
     position: relative;
-    background: var(--carbon);
-    border-radius: var(--r-card);
-    box-shadow: var(--hairline);
-    padding: clamp(20px, 4vw, 48px) clamp(8px, 2vw, 24px) 20px;
+    background: var(--surface-frosted-glass);
+    border-radius: var(--radius-cards);
+    box-shadow: var(--shadow-subtle-2), var(--shadow-subtle-3);
+    padding: clamp(20px, 4vw, 48px) clamp(8px, 2vw, 24px) 24px;
     overflow: hidden;
   }
   .showcase::before {
     content: "";
     position: absolute;
-    inset: auto 0 0 0;
-    height: 65%;
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, rgba(208,214,224,.10), transparent 70%);
+    inset: 0;
+    background: conic-gradient(at 50% -5%, transparent 44%, rgba(124, 145, 182, 0.14) 50%, transparent 56%);
     pointer-events: none;
   }
-  .book-viewport {
-    position: relative;
-    width: 100%;
-    touch-action: pan-y;
-  }
+  .book-viewport { position: relative; width: 100%; touch-action: pan-y; }
   .book-scale {
     position: absolute;
     top: 0; left: 50%;
@@ -438,17 +669,18 @@
     position: absolute;
     top: 6px; bottom: -6px;
     width: 100%;
-    background: var(--obsidian);
-    box-shadow: var(--hairline), 0 24px 48px -12px rgba(0,0,0,.7);
+    background: #090b16;
+    box-shadow: var(--shadow-subtle), 0 24px 48px -12px rgba(0, 0, 0, .8);
     transform: translateZ(-6px);
     transition: opacity .5s ease;
   }
-  .stack-r { left: 6px; border-radius: 4px 12px 12px 4px; }
-  .stack-l { left: -100%; margin-left: -6px; border-radius: 12px 4px 4px 12px; opacity: 0; }
+  .stack-r { left: 6px; border-radius: 4px 16px 16px 4px; }
+  .stack-l { left: -100%; margin-left: -6px; border-radius: 16px 4px 4px 16px; opacity: 0; }
   .book-scale.spread.has-left .stack-l { opacity: 1; }
   .book-scale.at-end .stack-r { opacity: 0; }
 
   .page {
+    --accent: var(--color-blueprint-blue);
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
@@ -460,23 +692,23 @@
   .page-front, .page-back {
     position: absolute;
     inset: 0;
-    border-radius: 4px 12px 12px 4px;
+    border-radius: 4px 16px 16px 4px;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     overflow: hidden;
-    background: linear-gradient(180deg, #131415 0%, var(--carbon) 100%);
-    box-shadow: var(--hairline);
+    background: linear-gradient(180deg, #0b0e1b 0%, var(--color-midnight-canvas) 100%);
+    box-shadow: var(--shadow-subtle-8);
   }
   .page-front::after, .page-back::after {
     content: "";
     position: absolute;
     inset: 0 auto 0 0;
     width: 12%;
-    background: linear-gradient(90deg, rgba(0,0,0,.55), transparent);
+    background: linear-gradient(90deg, rgba(0, 0, 0, .6), transparent);
     pointer-events: none;
     z-index: 3;
   }
-  .page-back { transform: rotateY(180deg); background: linear-gradient(180deg, var(--obsidian), var(--carbon)); }
+  .page-back { transform: rotateY(180deg); }
 
   /* Размытое фото на фоне страниц книги */
   .page-bg {
@@ -484,9 +716,9 @@
     inset: -18px;
     background-size: cover;
     background-position: center;
-    filter: blur(1px) saturate(1.15);
+    filter: blur(1px) saturate(.6);
     transform: scale(1.08);
-    opacity: 0.25;
+    opacity: 0.22;
     z-index: 0;
     pointer-events: none;
   }
@@ -499,7 +731,9 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(155deg, color-mix(in srgb, var(--accent, var(--iris)) 18%, transparent) 0%, rgba(15,16,17,0.78) 100%);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(124, 145, 182, 0.22), transparent 70%),
+      linear-gradient(180deg, rgba(5, 6, 15, 0.55) 0%, rgba(5, 6, 15, 0.88) 100%);
     pointer-events: none;
   }
 
@@ -513,48 +747,49 @@
   }
   .page-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .page-index {
-    font-family: var(--font-mono);
+    font-family: var(--font-dotdigital);
     font-size: 12px;
-    letter-spacing: -0.013em;
-    color: var(--fog);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-moon-mist);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 8px 2px 6px;
-    background: rgba(255,255,255,.05);
-    border-radius: var(--r-badge);
+    padding: 4px 10px 4px 8px;
+    background: rgba(199, 211, 234, 0.06);
+    border-radius: var(--radius-badges);
+    box-shadow: var(--shadow-subtle);
   }
   .page-index::before {
     content: "";
     width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
   }
   .page-company { margin-top: 26px; }
   .page-content h3 {
-    font-size: 26px;
-    line-height: 1.13;
-    letter-spacing: -0.012em;
-    font-weight: 510;
+    font-family: var(--font-aeonikpro);
+    font-size: 28px;
+    line-height: 1.14;
+    font-weight: 500;
+    background: var(--gradient-ice-highlight);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
-  .page-role {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 1.45;
-    color: var(--fog);
-  }
+  .page-role { margin-top: 10px; font-size: 14px; line-height: 1.45; color: var(--color-fog-veil); }
   .page-body {
     margin-top: 18px;
     font-size: 14px;
     line-height: 1.6;
-    letter-spacing: -0.006em;
-    color: var(--mist);
+    color: var(--color-moon-mist);
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--graphite) transparent;
+    scrollbar-color: var(--color-gridline-blue) transparent;
   }
   .page-body p + p { margin-top: 8px; }
-  .page-body .lbl { color: var(--paper); font-weight: 510; }
+  .page-body .lbl { color: var(--color-pure-white); font-weight: 500; }
   .page-body ul { margin-top: 8px; display: grid; gap: 4px; }
   .page-body li { position: relative; padding-left: 14px; }
   .page-body li::before {
@@ -563,21 +798,16 @@
     width: 4px; height: 4px; border-radius: 50%;
     background: var(--accent);
   }
-  .page-tags {
-    margin-top: auto;
-    padding-top: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+  .page-tags { margin-top: auto; padding-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
   .page-tag {
     font-size: 12px;
-    line-height: 1.4;
-    color: var(--bone);
-    padding: 3px 10px;
-    border-radius: var(--r-pill);
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent);
+    line-height: 1.33;
+    font-weight: 500;
+    color: var(--color-frost-glow);
+    padding: 4px 8px;
+    border-radius: var(--radius-badges);
+    background: rgba(199, 211, 234, 0.12);
+    box-shadow: rgba(199, 211, 234, 0.12) 0 1px 1px inset;
   }
 
   .back-content {
@@ -586,14 +816,19 @@
     display: flex; flex-direction: column; justify-content: space-between;
   }
   .back-num {
-    font-family: var(--font-mono);
-    font-size: 120px;
+    font-family: var(--font-aeonikpro);
+    font-size: 140px;
     line-height: .9;
+    font-weight: 500;
     letter-spacing: -0.04em;
-    color: var(--graphite);
+    background: var(--gradient-ice-highlight);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: .22;
   }
-  .back-title { font-size: 20px; line-height: 1.25; letter-spacing: -0.012em; color: var(--fog); max-width: 18ch; }
-  .back-bar { width: 40px; height: 2px; background: var(--accent); border-radius: 2px; margin-bottom: 14px; }
+  .back-title { font-size: 20px; line-height: 1.25; color: var(--color-moon-mist); max-width: 18ch; }
+  .back-bar { width: 40px; height: 2px; background: var(--accent); border-radius: 2px; margin-bottom: 14px; box-shadow: 0 0 10px var(--accent); }
 
   .book-nav {
     position: relative;
@@ -606,184 +841,125 @@
   }
   .book-nav .nbtn {
     width: 40px; height: 40px;
-    border-radius: var(--r-btn);
+    border-radius: var(--radius-buttons);
     border: 0;
-    background: transparent;
-    box-shadow: var(--hairline);
+    background: rgba(186, 214, 247, 0.06);
+    box-shadow: var(--shadow-subtle);
     display: grid;
     place-items: center;
     cursor: pointer;
-    color: var(--mist);
+    color: var(--color-frost-glow);
     transition: background .2s ease, opacity .2s ease, box-shadow .2s ease;
   }
-  .book-nav .nbtn:hover:not(:disabled) { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px var(--smoke); }
+  .book-nav .nbtn:hover:not(:disabled) { background: rgba(186, 214, 247, 0.12); box-shadow: var(--shadow-subtle-9); }
   .book-nav .nbtn:disabled { opacity: .3; cursor: default; }
   .book-nav svg { width: 16px; height: 16px; }
   .book-dots { display: flex; align-items: center; gap: 8px; }
   .dot {
     width: 6px; height: 6px;
-    border-radius: var(--r-pill);
+    border-radius: var(--radius-buttons);
     border: 0; padding: 0;
-    background: var(--smoke);
+    background: var(--color-gridline-blue);
     cursor: pointer;
-    transition: width .35s var(--ease), background .3s ease;
+    transition: width .35s var(--ease), background .3s ease, box-shadow .3s ease;
   }
-  .dot.active { width: 24px; background: var(--paper); }
-  .book-count { font-size: 12px; color: var(--fog); min-width: 44px; text-align: center; }
-
-  /* Адаптация для большого объема текста на мобильных в портретном режиме */
-  @media (max-width: 768px) and (orientation: portrait) {
-    .page, .page-front, .page-back, .book-page {
-      font-size: 14px !important;       /* Уменьшаем размер текста для компактности */
-      line-height: 1.4 !important;      /* Оптимизируем межстрочный интервал */
-      padding: 12px !important;         /* Уменьшаем внутренние отступы страниц */
-    }
-
-    /* Включаем прокрутку внутри страницы книги, если текст всё равно не влезает */
-    .page-front, .page-back {
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
-    }
-  }
+  .dot.active { width: 24px; background: var(--color-frost-glow); box-shadow: var(--shadow-sm); }
+  .book-count { font-size: 12px; color: var(--color-fog-veil); min-width: 44px; text-align: center; }
 
   /* ============================================================
-     6. ОБО МНЕ
+     8. ОБО МНЕ
   ============================================================ */
-  .about-grid {
-    display: grid;
-    grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr);
-    gap: clamp(28px, 6vw, 80px);
-    align-items: start;
-  }
-  .about-grid > .h-section { position: sticky; top: 88px; }
-  .about-card { padding: clamp(24px, 4vw, 40px); }
-  .about-card p { font-size: 17px; line-height: 1.6; color: var(--mist); max-width: 68ch; }
+  .about-card { max-width: 920px; margin-inline: auto; padding: clamp(24px, 4vw, 48px); }
+  .about-card p { font-size: 17px; line-height: 1.65; color: var(--color-moon-mist); }
   .about-card p + p { margin-top: 18px; }
-  .about-list { margin: 20px 0; display: grid; gap: 12px; }
+  .about-list { margin: 24px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .about-list li {
-    padding: 16px 18px;
-    background: rgba(255,255,255,.02);
-    border-radius: var(--r-btn);
-    box-shadow: var(--hairline);
-    font-size: 16px;
-    line-height: 1.55;
-    color: var(--mist);
-  }
-  .about-list .lbl { display: block; color: var(--paper); font-weight: 510; margin-bottom: 4px; }
-  .about-divider { height: 1px; background: var(--graphite); margin: 28px 0; }
-  @media (max-width: 860px) {
-    .about-grid { grid-template-columns: 1fr; }
-    .about-grid > .h-section { position: static; }
-  }
-
-  /* ============================================================
-     7. НАВЫКИ
-  ============================================================ */
-  .skill-rows { box-shadow: 0 -1px 0 var(--graphite); }
-  .skill-row {
-    display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr);
-    gap: 16px clamp(24px, 6vw, 80px);
-    padding: 32px 0;
-    box-shadow: 0 1px 0 var(--graphite);
-  }
-  .skill-row h3 {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 20px;
-    line-height: 1.33;
-    letter-spacing: -0.012em;
-    font-weight: 510;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    background: rgba(186, 214, 247, 0.03);
+    border-radius: var(--radius-cards);
+    box-shadow: var(--shadow-subtle-8);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-moon-mist);
   }
-  .skill-row h3::before {
-    content: "";
-    flex: none;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    margin-top: .6em;
-    background: var(--dotc, var(--iris));
-  }
-  .skill-row:nth-child(2) { --dotc: var(--green); }
-  .skill-row:nth-child(3) { --dotc: var(--teal); }
-  .skill-row:nth-child(4) { --dotc: var(--coral); }
-  .skill-row p { font-size: 15px; line-height: 1.6; letter-spacing: -0.011em; color: var(--mist); max-width: 64ch; }
-  .skill-row p + p { margin-top: 10px; }
-  .skill-row p.muted { color: var(--fog); }
-  @media (max-width: 760px) { .skill-row { grid-template-columns: 1fr; padding: 24px 0; } }
+  .about-list .lbl { display: block; color: var(--color-pure-white); font-weight: 500; font-size: 16px; }
+  .about-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--hairline), transparent); margin: 32px 0; }
+  @media (max-width: 760px) { .about-list { grid-template-columns: 1fr; } }
 
   /* ============================================================
-     8. ОБРАЗОВАНИЕ
+     9. НАВЫКИ
+  ============================================================ */
+  .skill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .skill-card { display: flex; flex-direction: column; gap: 18px; padding: 28px; }
+  .skill-card h3 { font-size: 22px; line-height: 1.25; letter-spacing: -0.01em; color: var(--color-ice-highlight); }
+  .skill-card p { font-size: 15px; line-height: 1.6; color: var(--color-moon-mist); }
+  .skill-card p + p { margin-top: 10px; }
+  .skill-card:hover .icon-tile { box-shadow: var(--shadow-subtle-8), var(--shadow-sm), var(--shadow-md); }
+  @media (max-width: 760px) { .skill-grid { grid-template-columns: 1fr; } }
+
+  /* ============================================================
+     10. ОБРАЗОВАНИЕ
   ============================================================ */
   .edu-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   @media (max-width: 760px) { .edu-grid { grid-template-columns: 1fr; } }
   .edu-card { padding: 28px; display: flex; flex-direction: column; gap: 14px; }
-  .edu-card h3 { font-size: 24px; line-height: 1.33; letter-spacing: -0.012em; }
-  .edu-card p { font-size: 15px; line-height: 1.6; color: var(--mist); }
-  .edu-card .badge { align-self: flex-start; font-family: var(--font-mono); letter-spacing: -0.013em; }
-  .edu-card .badge.b-green  { color: #6fd488; background: rgba(39,166,68,.14); }
-  .edu-card .badge.b-violet { color: #a5a7f7; background: rgba(99,102,241,.16); }
+  .edu-card h3 { font-family: var(--font-aeonikpro); font-size: 26px; line-height: 1.2; }
+  .edu-card p { font-size: 15px; line-height: 1.6; color: var(--color-moon-mist); }
+  .edu-card .badge { align-self: flex-start; font-family: var(--font-dotdigital); letter-spacing: .04em; }
   .edu-lines { display: grid; gap: 4px; }
 
   /* ============================================================
-     9. КОНТАКТЫ (4 ПЛАШКИ)
+     11. КОНТАКТЫ
   ============================================================ */
-  .contact-grid {
-    display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-    gap: clamp(28px, 6vw, 80px);
-    align-items: start;
-  }
-  @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
-  .contact-list { display: grid; gap: 12px; }
-  .contact-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 24px;
-  }
-  .contact-row .icon {
-    width: 40px; height: 40px;
-    border-radius: var(--r-btn);
-    background: rgba(255,255,255,.05);
-    display: grid; place-items: center;
-    flex: none;
-    color: var(--mist);
-  }
-  .contact-row .icon svg { width: 18px; height: 18px; }
-  .contact-row .label { display: block; font-size: 13px; line-height: 1.2; color: var(--fog); margin-bottom: 4px; }
-  .contact-row .value { font-size: 17px; font-weight: 510; letter-spacing: -0.011em; color: var(--paper); overflow-wrap: anywhere; }
-  .contact-row .go { margin-left: auto; width: 16px; height: 16px; color: var(--ash); flex: none; transition: transform .25s ease, color .25s ease; }
-  .contact-row:hover .go { transform: translate(2px, -2px); color: var(--paper); }
+  .contact-list { max-width: 760px; margin-inline: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 760px) { .contact-list { grid-template-columns: 1fr; } }
+  .contact-row { display: flex; align-items: center; gap: 16px; padding: 20px 22px; }
+  .contact-row .icon-tile { width: 48px; height: 48px; }
+  .contact-row .icon-tile svg { width: 20px; height: 20px; }
+  .contact-row .label { display: block; font-size: 12px; line-height: 1.33; color: var(--color-fog-veil); margin-bottom: 4px; font-family: var(--font-dotdigital); letter-spacing: .08em; text-transform: uppercase; }
+  .contact-row .value { font-size: 16px; font-weight: 500; color: var(--color-pure-white); overflow-wrap: anywhere; }
+  .contact-row .go { margin-left: auto; width: 16px; height: 16px; color: var(--color-fog-veil); flex: none; transition: transform .25s ease, color .25s ease; }
+  .contact-row:hover .go { transform: translate(2px, -2px); color: var(--color-pure-white); }
+  .contact-row:hover { transform: translateY(-2px); }
 
   footer {
     margin-top: var(--section-gap);
-    padding: 28px 0 40px;
-    box-shadow: 0 -1px 0 var(--graphite);
-    color: var(--fog);
+    padding: 32px 0 48px;
+    text-align: center;
+    color: var(--color-fog-veil);
     font-size: 13px;
     line-height: 1.5;
   }
+  footer::before {
+    content: "";
+    display: block;
+    height: 1px;
+    max-width: var(--page-max-width);
+    margin: 0 auto 32px;
+    background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+  }
 
   /* ============================================================
-     10. БОКОВЫЕ ПАНЕЛИ СТАТИСТИКИ
+     12. БОКОВЫЕ ПАНЕЛИ СТАТИСТИКИ
   ============================================================ */
   .side-panel {
     position: fixed;
-    top: 96px;
+    top: 104px;
     z-index: 40;
-    width: 176px;
+    width: 180px;
     padding: 12px 14px;
-    background: rgba(15,16,17,.88);
-    border-radius: var(--r-card);
-    box-shadow: var(--hairline);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    font-family: var(--font-mono);
+    background: rgba(5, 6, 15, 0.72);
+    border-radius: var(--radius-cards);
+    box-shadow: var(--shadow-subtle-6), var(--shadow-subtle-3);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-family: var(--font-dotdigital);
     font-size: 11px;
     line-height: 1.6;
-    letter-spacing: -0.013em;
-    color: var(--fog);
+    color: var(--color-fog-veil);
     display: none;
   }
   .side-panel-left { left: 20px; }
@@ -791,20 +967,21 @@
   @media (min-width: 1620px) { .side-panel { display: block; } }
   .sp-title {
     display: flex; align-items: center; justify-content: space-between;
-    color: var(--paper);
+    color: var(--color-frost-glow);
     padding-bottom: 6px; margin-bottom: 8px;
-    box-shadow: 0 1px 0 var(--graphite);
+    box-shadow: 0 1px 0 var(--hairline);
+    letter-spacing: .08em;
   }
-  .sp-k { color: var(--ash); }
-  .sp-v { color: var(--mist); }
-  .sp-bar { color: var(--mist); margin: 4px 0; letter-spacing: 0; }
-  .sp-foot { margin-top: 8px; padding-top: 6px; box-shadow: 0 -1px 0 var(--graphite); font-size: 10px; color: var(--ash); }
+  .sp-k { color: var(--color-gridline-blue); }
+  .sp-v { color: var(--color-moon-mist); }
+  .sp-bar { color: var(--color-blueprint-blue); margin: 4px 0; letter-spacing: 0; }
+  .sp-foot { margin-top: 8px; padding-top: 6px; box-shadow: 0 -1px 0 var(--hairline); font-size: 10px; color: var(--color-gridline-blue); }
   .status-pulse {
     display: inline-block;
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
+    background: var(--color-blueprint-blue);
+    box-shadow: 0 0 8px var(--color-blueprint-blue);
     animation: blink 1.6s infinite ease-in-out;
   }
   @keyframes blink { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
@@ -812,44 +989,158 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .page, .book-shift, .book { transition-duration: .01s !important; }
-    .status-pulse { animation: none; }
+    .status-pulse, .spotlight *, .bg-glow, .tools-row::after { animation: none !important; }
+    .js .reveal { opacity: 1; transform: none; }
   }
-  /* Адаптация для большого объема текста на мобильных в портретном режиме */
-  @media (max-width: 768px) and (orientation: portrait) {
-    .page, .page-front, .page-back, .book-page {
-      font-size: 8px !important;       /* Уменьшаем размер текста для компактности */
-      line-height: 1.4 !important;      /* Оптимизируем межстрочный интервал */
-      padding: 12px !important;         /* Уменьшаем внутренние отступы страниц */
+  /* ============================================================
+     МОБИЛЬНАЯ ОПТИМИЗАЦИЯ (РАЗГРУЗКА ТЕЛЕФОНА И КОМПАКТНАЯ КНИГА)
+  ============================================================ */
+  @media (max-width: 768px) {
+    /* 1. Отключение тяжелых фоновых анимаций и Canvas на смартфонах для максимальной производительности */
+    #bgCanvas, #gridCanvas, #cursorCanvas {
+      display: none !important;
+    }
+    .bg-glow {
+      animation: none !important;
+      filter: blur(25px) !important;
+      opacity: 0.18 !important;
+    }
+    .spotlight .beam, .spotlight .beam.wide, .spotlight .halo {
+      animation: none !important;
+      opacity: 0.6 !important;
+    }
+    .tools-row::after {
+      display: none !important;
+    }
+    .fan-slot .auth-card {
+      animation: none !important;
+      transform: none !important;
     }
 
-    /* Включаем прокрутку внутри страницы книги, если текст всё равно не влезает */
+    /* 2. Облегчение 3D-книги: убираем тяжелый blur на фоне страниц для плавной работы без лагов */
+    .page-bg {
+      filter: none !important;
+      opacity: 0.12 !important;
+    }
+    .page {
+      will-change: transform;
+    }
+    .showcase {
+      padding: 16px 8px 16px;
+    }
+    /* Центрирование книги и карточек на мобильном */
+    .stack-l {
+      display: none !important;
+    }
+    .stack-r {
+      left: 0 !important;
+      border-radius: 16px !important;
+    }
     .page-front, .page-back {
+      border-radius: 16px !important;
+    }
+
+    /* 3. Пропорциональное отображение текста в книге на мобильном:
+          текст сохраняет естественные пропорции (14.5-15px для тела, 22px для заголовков),
+          точно как в блоке "Обо мне" на мобильном экране */
+    .page-content {
+      padding: 22px 18px 18px !important;
+    }
+    .page-index {
+      font-size: 11px !important;
+      padding: 3px 8px !important;
+    }
+    .page-company {
+      margin-top: 14px !important;
+    }
+    .page-content h3 {
+      font-size: 22px !important;
+      line-height: 1.25 !important;
+    }
+    .page-role {
+      margin-top: 6px !important;
+      font-size: 13.5px !important;
+      line-height: 1.4 !important;
+      color: var(--color-fog-veil) !important;
+    }
+    .page-body {
+      margin-top: 14px !important;
+      font-size: 14.5px !important;
+      line-height: 1.55 !important;
+      color: var(--color-moon-mist) !important;
       overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+      -webkit-overflow-scrolling: touch;
+    }
+    .page-body p + p {
+      margin-top: 10px !important;
+    }
+    .page-body .lbl {
+      color: var(--color-pure-white) !important;
+      font-size: 15px !important;
+      font-weight: 500 !important;
+    }
+    /* Скрываем длинные второстепенные параграфы и списки для чистоты и легкости восприятия */
+    .page-body p:nth-of-type(n+3) {
+      display: none !important;
+    }
+    .page-body ul {
+      display: none !important;
+    }
+    .page-body .lbl:last-of-type {
+      display: none !important;
+    }
+
+    /* Ограничиваем теги только первыми 3 штуками */
+    .page-tags {
+      margin-top: auto !important;
+      padding-top: 12px !important;
+      gap: 6px !important;
+    }
+    .page-tag {
+      font-size: 12px !important;
+      padding: 3px 9px !important;
+      line-height: 1.35 !important;
+    }
+    .page-tag:nth-child(n+4) {
+      display: none !important;
+    }
+
+    /* Обратная сторона страниц */
+    .back-content {
+      padding: 24px 20px !important;
+    }
+    .back-num {
+      font-size: 88px !important;
+    }
+    .back-title {
+      font-size: 18px !important;
+      line-height: 1.3 !important;
     }
   }
-  /* Адаптация размеров книги под телефон */
+
+  /* Адаптация размеров книги под экран телефона */
   @media (max-width: 768px) and (orientation: portrait) {
     :root {
-      --pw: 90vw !important; /* Уменьшаем ширину */
-      --hw: 65vh !important; /* Уменьшаем высоту */
+      --pw: 100% !important;
+      --hw: 65vh !important;
     }
   }
-
-  @media (max-width: 768px) {
-  .page-tag:nth-child(n+4) {
-    display: none;
-  }
-}
 </style>
 </head>
 <body>
 
-<!-- Холст кастомного курсора -->
-<canvas id="cursorCanvas"></canvas>
+<!-- Фоновые слои: сетка-чертёж, свечения, сигналы по сетке, частицы -->
+<div class="bg-layer bg-grid bg-mask" aria-hidden="true"></div>
+<div class="bg-layer" aria-hidden="true">
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="bg-glow g3"></div>
+</div>
+<canvas id="gridCanvas" class="bg-mask" aria-hidden="true"></canvas>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-<!-- Холст фоновых частиц -->
-<canvas id="bgCanvas"></canvas>
+<!-- Холст кастомного курсора -->
+<canvas id="cursorCanvas" aria-hidden="true"></canvas>
 
 <!-- Боковые терминалы статистики -->
 <aside class="side-panel side-panel-left" id="panelLeft" aria-hidden="true"></aside>
@@ -859,16 +1150,16 @@
 <nav class="nav" aria-label="Основная навигация">
   <div class="container nav-inner">
     <a href="#hero" class="brandmark" id="top">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 16l8-8M8 11l5-5M11 16l5-5"/></svg>
-      Руслан<span> Альминов</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#d1e4fa" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 16l8-8M8 11l5-5M11 16l5-5"/></svg>
+      Руслан Альминов
     </a>
     <div class="nav-links">
-      <a href="#experience">Опыт работы</a>
-      <a href="#about">Обо мне</a>
-      <a href="#skills">Навыки</a>
-      <a href="#education">Образование и сертификаты</a>
+      <a href="#experience" id="nav-experience">Опыт работы</a>
+      <a href="#about" id="nav-about">Обо мне</a>
+      <a href="#skills" id="nav-skills">Навыки</a>
+      <a href="#education" id="nav-education">Образование и сертификаты</a>
     </div>
-    <a href="#contact" class="nav-cta">Написать</a>
+    <a href="#contact" class="btn btn-ghost" id="nav-cta">Написать</a>
   </div>
 </nav>
 
@@ -877,48 +1168,114 @@
        ШАПКА (HERO)
   ============================================================ -->
   <header class="hero" id="hero">
-    <div class="container hero-grid">
-      <div class="hero-text">
-        <p class="hero-eyebrow-role"><span class="pill">Профессия и специализация</span></p>
-        <h1>Руслан Альминов</h1>
-        <p class="hero-lead">Администратор банковских систем | Backend &amp; Automation Specialist</p>
-        <p class="hero-intro">Я объединяю практический опыт банковского обслуживания с инженерным подходом к IT. Настраиваю системные процессы, работаю с АБС, CRM и API, а также создаю скрипты автоматизации (Python, PowerShell, n8n), чтобы превратить рутину в надежно работающие алгоритмы.</p>
-        <div class="hero-actions">
-          <a href="#experience" class="btn btn-primary">
-            Смотреть опыт работы
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
-          </a>
+    <div class="spotlight" aria-hidden="true">
+      <div class="halo"></div>
+      <div class="beam wide"></div>
+      <div class="beam"></div>
+    </div>
+
+    <div class="container hero-inner">
+      <p class="eyebrow reveal">Профессия и специализация</p>
+      <h1 class="skywash reveal">Руслан Альминов</h1>
+      <p class="hero-lead reveal">Администратор банковских систем | Backend &amp; Automation Specialist</p>
+      <p class="hero-intro reveal">Я объединяю практический опыт банковского обслуживания с инженерным подходом к IT. Настраиваю системные процессы, работаю с АБС, CRM и API, а также создаю скрипты автоматизации (Python, PowerShell, n8n), чтобы превратить рутину в надежно работающие алгоритмы.</p>
+      <div class="hero-actions reveal">
+        <a href="#experience" class="btn btn-ghost btn-lg" id="hero-cta-experience">
+          Смотреть опыт работы
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+        </a>
+        <a href="#contact" class="btn btn-outline btn-lg" id="hero-cta-contact">Написать</a>
+      </div>
+
+      <!-- Веер стеклянных карточек -->
+      <div class="fan reveal">
+        <!-- Левая: специализация -->
+        <div class="fan-slot left">
+          <div class="auth-card card">
+            <div class="auth-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></svg></div>
+            <p class="auth-title">Backend &amp; Automation</p>
+            <p class="auth-sub">Администратор банковских систем</p>
+            <div class="stack-badges">
+              <span class="badge">Python</span>
+              <span class="badge">PowerShell</span>
+              <span class="badge">n8n</span>
+              <span class="badge">REST API</span>
+              <span class="badge">PostgreSQL</span>
+              <span class="badge">АБС</span>
+              <span class="badge">CRM</span>
+              <span class="badge">Helpdesk TSM</span>
+            </div>
+            <ul class="mini-list">
+              <li>Алиф Банк — 07.2025 – до сих пор</li>
+              <li>Выпускник Alif Academy</li>
+              <li>Душанбе, Таджикистан</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Центральная: фото -->
+        <div class="fan-slot center">
+          <div class="auth-card card">
+            <div class="auth-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
+            <p class="auth-title">Руслан Альминов</p>
+            <p class="auth-sub">Альминов Руслан Константинович</p>
+            <div class="photo-screen" id="photoScreen">
+              <img src="images/photo.png" alt="Фото — Руслан Альминов" onerror="this.parentNode.classList.add('no-photo')">
+              <div class="photo-mono" aria-hidden="true">РА</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Правая: связаться -->
+        <div class="fan-slot right">
+          <div class="auth-card card">
+            <div class="auth-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></div>
+            <p class="auth-title">Связаться со мной</p>
+            <span class="field-label">Email</span>
+            <a class="field" href="mailto:Laststyle92@gmail.com" id="hero-field-email">Laststyle92@gmail.com</a>
+            <a class="btn btn-violet" href="mailto:Laststyle92@gmail.com" id="hero-btn-write">Написать</a>
+            <div class="divider-or">или</div>
+            <a class="provider" href="https://t.me/prototypear" target="_blank" rel="noopener" id="hero-btn-telegram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 4L3 11l6 2.5L11 20l3-4.5 5 3.5L21 4z"/><path d="M9 13.5L21 4"/></svg>
+              Telegram
+            </a>
+            <a class="provider" href="https://github.com/Laststyle92" target="_blank" rel="noopener" id="hero-btn-github">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+          </div>
         </div>
       </div>
 
-      <div class="photo-frame">
-        <div class="photo-bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="photo-screen" id="photoScreen">
-          <img src="images/photo.png" alt="Фото" onerror="this.parentNode.classList.add('no-photo')">
-          <div class="photo-mono" aria-hidden="true">РА</div>
+      <!-- Ряд инструментов -->
+      <div class="tools reveal" aria-label="Инструменты">
+        <p class="eyebrow">Инструменты</p>
+        <div class="tools-row">
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3"/></svg></div><span>Python</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/></svg></div><span>PowerShell</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div><span>PostgreSQL</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></div><span>REST API</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 8v8M18 10c0 4-6 3-11 7"/></svg></div><span>Git</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div><span>GitHub</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="19" cy="12" r="2"/><path d="M7 11l3-3.5M7 13l3 3.5M14 7l3 3.5M14 17l3-3.5"/></svg></div><span>n8n</span></div>
+          <div class="tool"><div class="icon-tile"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8h18M7 13h4M7 16h7"/></svg></div><span>PyCharm</span></div>
         </div>
       </div>
     </div>
   </header>
-
-  <!-- Полоса инструментов -->
-  <div class="tools" aria-label="Инструменты">
-    <div class="container tools-row">
-      <span>Python</span><span>PowerShell</span><span>PostgreSQL</span><span>REST API</span><span>Git</span><span>GitHub</span><span>n8n</span><span>PyCharm</span>
-    </div>
-  </div>
 
   <!-- ============================================================
        ОПЫТ РАБОТЫ — 3D КНИГА НА 4 СТРАНИЦЫ
   ============================================================ -->
   <section class="section" id="experience">
     <div class="container">
-      <div class="section-head">
-        <h2 class="h-section">Опыт работы</h2>
+      <div class="section-head reveal">
+        <p class="eyebrow">01 · Опыт</p>
+        <h2 class="h-section skywash">Опыт работы</h2>
         <p class="section-note">Пролистайте книгу стрелками или точками ниже — каждая страница отдельное место работы.</p>
       </div>
 
-      <div class="showcase" id="showcase">
+      <div class="showcase reveal" id="showcase">
         <div class="book-viewport" id="bookViewport" tabindex="0" aria-label="Опыт работы — книга">
           <div class="book-scale" id="bookScale">
             <div class="book-shift" id="bookShift">
@@ -927,7 +1284,7 @@
                 <div class="stack stack-r"></div>
 
                 <!-- СТРАНИЦА 1 -->
-                <div class="page" data-index="0" style="--accent: var(--iris)">
+                <div class="page" data-index="0">
                   <div class="page-front">
                     <div class="page-bg" data-bg="0"></div>
                     <div class="page-tint"></div>
@@ -951,7 +1308,7 @@
                       </div>
                       <div class="page-tags">
                         <span class="page-tag">Python</span>
-                        <span class="page-tag">L2/L3 Поддержка & Поиск багов</span>
+                        <span class="page-tag">L2/L3 Поддержка &amp; Поиск багов</span>
                         <span class="page-tag">pgAdmin</span>
                         <span class="page-tag">Django/FastAPI/Flask</span>
                         <span class="page-tag">PowerShell</span>
@@ -973,7 +1330,7 @@
                 </div>
 
                 <!-- СТРАНИЦА 2 -->
-                <div class="page" data-index="1" style="--accent: #E7B24C">
+                <div class="page" data-index="1">
                   <div class="page-front">
                     <div class="page-bg" data-bg="1"></div>
                     <div class="page-tint"></div>
@@ -1010,7 +1367,7 @@
                 </div>
 
                 <!-- СТРАНИЦА 3 -->
-                <div class="page" data-index="2" style="--accent: var(--coral)">
+                <div class="page" data-index="2">
                   <div class="page-front">
                     <div class="page-bg" data-bg="2"></div>
                     <div class="page-tint"></div>
@@ -1046,7 +1403,7 @@
                 </div>
 
                 <!-- СТРАНИЦА 4 -->
-                <div class="page" data-index="3" style="--accent: var(--green)">
+                <div class="page" data-index="3">
                   <div class="page-front">
                     <div class="page-bg" data-bg="3"></div>
                     <div class="page-tint"></div>
@@ -1066,12 +1423,12 @@
                         <span class="page-tag">Работа с CRM</span>
                         <span class="page-tag">Helpdesk</span>
                         <span class="page-tag">TSM</span>
-                        <span class="page-tag">Кассовые & Валютные операции</span>
+                        <span class="page-tag">Кассовые &amp; Валютные операции</span>
                         <span class="page-tag">Кросс-функциональное взаимодействие</span>
                         <span class="page-tag">Выпуск и обслуживание карт (Visa/Mastercard/Корти Милли)</span>
-                        <span class="page-tag">Кредитный скоринг & Депозиты</span>
+                        <span class="page-tag">Кредитный скоринг &amp; Депозиты</span>
                         <span class="page-tag">Аналитика и банковская отчетность</span>
-                        <span class="page-tag">Обслуживание терминалов & Инкассация</span>
+                        <span class="page-tag">Обслуживание терминалов &amp; Инкассация</span>
                         <span class="page-tag">Диагностика и Troubleshooting</span>
                         <span class="page-tag">Первичная идентификация (KYC)</span>
                       </div>
@@ -1110,13 +1467,22 @@
        ОБО МНЕ
   ============================================================ -->
   <section class="section" id="about">
-    <div class="container about-grid">
-      <h2 class="h-section">Обо мне</h2>
-      <div class="card about-card">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">02 · Профиль</p>
+        <h2 class="h-section skywash">Обо мне</h2>
+      </div>
+      <div class="card about-card reveal">
         <p>Я специалист с высшим образованием и разносторонним бэкграундом — от настройки промышленного оборудования до работы с финансовыми продуктами и IT-инфраструктурой. В банковском секторе мой фокус направлен на два ключевых направления:</p>
         <ul class="about-list">
-          <li><span class="lbl">Качественный сервис и операции:</span> уверенно работаю с кассовыми операциями, оформлением кредитных продуктов и банковских карт (Visa, Корти Милли, Mastercard), а также помогу клиентам решить любые технические вопросы с приложением.</li>
-          <li><span class="lbl">Системная поддержка и автоматизация:</span> глубоко понимаю внутренние банковские процессы (АБС, CRM, тикетинг TSM), умею проектировать backend-логику, работать с API и оптимизировать рабочие сценарии через автоматизацию.</li>
+          <li>
+            <span class="icon-tile"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg></span>
+            <span><span class="lbl">Качественный сервис и операции:</span> уверенно работаю с кассовыми операциями, оформлением кредитных продуктов и банковских карт (Visa, Корти Милли, Mastercard), а также помогу клиентам решить любые технические вопросы с приложением.</span>
+          </li>
+          <li>
+            <span class="icon-tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span>
+            <span><span class="lbl">Системная поддержка и автоматизация:</span> глубоко понимаю внутренние банковские процессы (АБС, CRM, тикетинг TSM), умею проектировать backend-логику, работать с API и оптимизировать рабочие сценарии через автоматизацию.</span>
+          </li>
         </ul>
         <div class="about-divider"></div>
         <p>Опытный специалист в сфере банковского администрирования с фокусом на цифровизации и оптимизации инфраструктуры. Мой приоритет — превращение сложных, повторяющихся операционных задач в отлаженные и автоносно работающие алгоритмы. Свободно применяю Python и PowerShell для написания скриптов любой сложности, а также использую платформу n8n для построения бесшовных интеграций и автоматизированных сценариев между сервисами. Сочетаю высокие стандарты ответственности банковского сектора с современными инженерными IT-практиками.</p>
@@ -1129,33 +1495,38 @@
   ============================================================ -->
   <section class="section" id="skills">
     <div class="container">
-      <div class="section-head">
-        <h2 class="h-section">Навыки</h2>
+      <div class="section-head reveal">
+        <p class="eyebrow">03 · Компетенции</p>
+        <h2 class="h-section skywash">Навыки</h2>
         <p class="section-note">Основные инструменты и области.</p>
       </div>
-      <div class="skill-rows">
-        <div class="skill-row">
+      <div class="skill-grid">
+        <div class="card skill-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></svg></span>
           <h3>IT, Разработка и Автоматизация</h3>
           <div>
             <p>Python, PowerShell, PyCharm Professional.</p>
             <p>Backend &amp; Интеграции: Разработка Backend-логики, работа с REST API, построение сценариев автоматизации в n8n</p>
           </div>
         </div>
-        <div class="skill-row">
+        <div class="card skill-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M19 10v8M9 10v8M15 10v8M3 20h18"/></svg></span>
           <h3>Банковский сектор Alif Bank — Администратор / Специалист</h3>
           <div>
             <p>Специализированный софт: АБС, CRM, Admin-панели, Helpdesk, TSM.</p>
             <p>Продукты и Сервис: Кассовые операции, выпуск и обслуживание карт (Visa, Корти Милли, Mastercard), выдача микрокредитов, техническая поддержка пользователей приложения</p>
           </div>
         </div>
-        <div class="skill-row">
+        <div class="card skill-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span>
           <h3>Asian Business Group</h3>
           <div>
             <p>Стажировка Младший помощник юриста, работа с документацией перевод её, ещё работа регламентами и бизнес-процессами. </p>
             <p>Составление Презинтаций, Таблиц, Документов (PowerPoint, Exel, Word, Outlook)</p>
           </div>
         </div>
-        <div class="skill-row">
+        <div class="card skill-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></span>
           <h3>Выпускник Alif Academy </h3>
           <div>
             <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub). Получил рекомендательное письмо об успешном окончании курсов.</p>
@@ -1170,18 +1541,21 @@
   ============================================================ -->
   <section class="section" id="education">
     <div class="container">
-      <div class="section-head">
-        <h2 class="h-section">Образование и сертификаты</h2>
+      <div class="section-head reveal">
+        <p class="eyebrow">04 · Обучение</p>
+        <h2 class="h-section skywash">Образование и сертификаты</h2>
       </div>
       <div class="edu-grid">
-        <div class="card edu-card">
-          <h3>Выпускник Alif Academy</h3>
-          <span class="badge b-green">06.2025 – 06.2026</span>
+        <div class="card edu-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3"/></svg></span>
+          <h3 class="skywash">Выпускник Alif Academy</h3>
+          <span class="badge">06.2025 – 06.2026</span>
           <p>Прошел интенсивную подготовку по автоматизации процессов на Python, работе с REST API, базами данных PostgreSQL (pgAdmin) и системами контроля версий (Git / GitHub). Получил рекомендательное письмо об успешном окончании курсов.</p>
         </div>
-        <div class="card edu-card">
-          <h3>Юридическое образование</h3>
-          <span class="badge b-violet">09.2015 – 07.2021</span>
+        <div class="card edu-card reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7c0 1.7 1.3 3 3 3s3-1.3 3-3zM19 7l-3 7c0 1.7 1.3 3 3 3s3-1.3 3-3zM8 21h8"/></svg></span>
+          <h3 class="skywash">Юридическое образование</h3>
+          <span class="badge">09.2015 – 07.2021</span>
           <div class="edu-lines">
             <p>Российско-Таджикский (Славянский) университет</p>
             <p>Факультет: Юридический (Бакалаврият, Магистратура)</p>
@@ -1197,12 +1571,15 @@
        КОНТАКТЫ (4 ПЛАШКИ)
   ============================================================ -->
   <section class="section" id="contact">
-    <div class="container contact-grid">
-      <h2 class="h-section">Связаться со мной</h2>
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">05 · Контакты</p>
+        <h2 class="h-section skywash">Связаться со мной</h2>
+      </div>
       <div class="contact-list">
         <!-- 1. Email -->
-        <a class="card contact-row" href="mailto:Laststyle92@gmail.com">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <a class="card contact-row reveal" href="mailto:Laststyle92@gmail.com" id="contact-email">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
           <span>
             <span class="label">Email</span>
             <span class="value">Laststyle92@gmail.com</span>
@@ -1211,8 +1588,8 @@
         </a>
 
         <!-- 2. Telegram -->
-        <a class="card contact-row" href="https://t.me/prototypear" target="_blank" rel="noopener">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 4L3 11l6 2.5L11 20l3-4.5 5 3.5L21 4z"/><path d="M9 13.5L21 4"/></svg></span>
+        <a class="card contact-row reveal" href="https://t.me/prototypear" target="_blank" rel="noopener" id="contact-telegram">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M21 4L3 11l6 2.5L11 20l3-4.5 5 3.5L21 4z"/><path d="M9 13.5L21 4"/></svg></span>
           <span>
             <span class="label">Telegram</span>
             <span class="value">@prototypear</span>
@@ -1221,8 +1598,8 @@
         </a>
 
         <!-- 3. GitHub / портфолио -->
-        <a class="card contact-row" href="https://github.com/Laststyle92" target="_blank" rel="noopener">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span>
+        <a class="card contact-row reveal" href="https://github.com/Laststyle92" target="_blank" rel="noopener" id="contact-github">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span>
           <span>
             <span class="label">GitHub / портфолио</span>
             <span class="value">github.com/Laststyle92</span>
@@ -1231,8 +1608,8 @@
         </a>
 
         <!-- 4. Локация -->
-        <div class="card contact-row">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-7.3 7-12a7 7 0 0 0-14 0c0 4.7 7 12 7 12z"/></svg></span>
+        <div class="card contact-row reveal">
+          <span class="icon-tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-7.3 7-12a7 7 0 0 0-14 0c0 4.7 7 12 7 12z"/></svg></span>
           <span>
             <span class="label">Локация</span>
             <span class="value">Душанбе, Таджикистан</span>
@@ -1255,7 +1632,7 @@
   const finePointer = window.matchMedia("(pointer: fine)").matches;
 
   /* ============================================================
-     1. КУРСОР СО ШЛЕЙФОМ ИЗ ИСКР
+     1. КУРСОР СО ШЛЕЙФОМ ИЗ ИСКР (морозно-голубой)
   ============================================================ */
   (function initCursor() {
     if (!finePointer) return;
@@ -1288,9 +1665,9 @@
 
     function drawGlow(x, y, radius, alpha) {
       const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      g.addColorStop(0, "rgba(255,255,255," + alpha + ")");
-      g.addColorStop(0.45, "rgba(255,255,255," + (alpha * 0.45).toFixed(3) + ")");
-      g.addColorStop(1, "rgba(255,255,255,0)");
+      g.addColorStop(0, "rgba(216,236,248," + alpha + ")");
+      g.addColorStop(0.45, "rgba(182,217,252," + (alpha * 0.45).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(182,217,252,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -1313,11 +1690,91 @@
   })();
 
   /* ============================================================
-     2. ФОНОВЫЕ ЧАСТИЦЫ (НИЖЕ БЛОКА ИНСТРУМЕНТОВ)
+     2. ФОН: СВЕТОВЫЕ СИГНАЛЫ, БЕГУЩИЕ ПО ЛИНИЯМ СЕТКИ (80px)
+  ============================================================ */
+  (function initGridSignals() {
+    const canvas = document.getElementById("gridCanvas");
+    if (!canvas || reduceMotion || window.innerWidth <= 768) return;
+    const ctx = canvas.getContext("2d");
+    const CELL = 80;
+    let w, h, dpr, signals = [];
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + "px"; canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    function spawn() {
+      const horizontal = Math.random() < 0.5;
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const lines = Math.floor((horizontal ? h : w) / CELL);
+      const k = 1 + Math.floor(Math.random() * Math.max(1, lines));
+      const span = horizontal ? w : h;
+      return {
+        horizontal: horizontal,
+        dir: dir,
+        line: k * CELL + 0.5,
+        pos: dir > 0 ? -160 : span + 160,
+        speed: 1.2 + Math.random() * 2.2,
+        len: 90 + Math.random() * 140,
+        span: span
+      };
+    }
+
+    const MAX = Math.max(4, Math.min(10, Math.floor(window.innerWidth / 180)));
+    let last = 0;
+
+    function tick(t) {
+      ctx.clearRect(0, 0, w, h);
+      if (signals.length < MAX && t - last > 700) { signals.push(spawn()); last = t; }
+
+      for (let i = 0; i < signals.length; i++) {
+        const s = signals[i];
+        s.pos += s.speed * s.dir;
+        const head = s.pos, tail = s.pos - s.len * s.dir;
+        let x1, y1, x2, y2;
+        if (s.horizontal) { x1 = tail; y1 = s.line; x2 = head; y2 = s.line; }
+        else { x1 = s.line; y1 = tail; x2 = s.line; y2 = head; }
+
+        const g = ctx.createLinearGradient(x1, y1, x2, y2);
+        g.addColorStop(0, "rgba(186,215,247,0)");
+        g.addColorStop(1, "rgba(186,215,247,0.55)");
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        const hx = s.horizontal ? head : s.line;
+        const hy = s.horizontal ? s.line : head;
+        const glow = ctx.createRadialGradient(hx, hy, 0, hx, hy, 6);
+        glow.addColorStop(0, "rgba(216,236,248,0.9)");
+        glow.addColorStop(1, "rgba(182,217,252,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      signals = signals.filter(function (s) {
+        return s.dir > 0 ? s.pos - s.len < s.span + 20 : s.pos + s.len > -20;
+      });
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
+  /* ============================================================
+     3. ФОНОВЫЕ ЧАСТИЦЫ — «морозная пыль» с параллаксом
   ============================================================ */
   (function initBackground() {
     const canvas = document.getElementById("bgCanvas");
-    if (!canvas) return;
+    if (!canvas || reduceMotion || window.innerWidth <= 768) return;
     const ctx = canvas.getContext("2d");
     let w, h, particles = [];
 
@@ -1328,8 +1785,8 @@
     resize();
     window.addEventListener("resize", resize);
 
-    const count = Math.max(24, Math.min(70, Math.floor((window.innerWidth * window.innerHeight) / 22000)));
-    const hues = ["255,255,255", "255,255,255", "214,226,255"];
+    const count = Math.max(20, Math.min(60, Math.floor((window.innerWidth * window.innerHeight) / 26000)));
+    const hues = ["216,236,248", "182,217,252", "199,211,234"];
 
     function makeParticle() {
       const depth = Math.random();
@@ -1337,9 +1794,10 @@
         x: Math.random() * w,
         y: Math.random() * h,
         depth: depth,
-        r: 0.6 + depth * 2.2,
-        vx: (Math.random() - 0.5) * (0.04 + depth * 0.12),
-        vy: (Math.random() - 0.5) * (0.04 + depth * 0.12),
+        r: 0.5 + depth * 1.8,
+        vx: (Math.random() - 0.5) * (0.04 + depth * 0.1),
+        vy: -(0.02 + depth * 0.1),
+        tw: Math.random() * Math.PI * 2,
         hue: hues[Math.floor(Math.random() * hues.length)]
       };
     }
@@ -1351,34 +1809,23 @@
       targetY = (e.clientY / window.innerHeight) - 0.5;
     });
 
-    const toolsEl = document.querySelector(".tools");
-
     function tick() {
       ctx.clearRect(0, 0, w, h);
       parX += (targetX - parX) * 0.02;
       parY += (targetY - parY) * 0.02;
 
-      let topLimit = 0;
-      if (toolsEl) {
-        topLimit = Math.max(0, toolsEl.getBoundingClientRect().bottom);
-      }
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0, topLimit, w, Math.max(0, h - topLimit));
-      ctx.clip();
-
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
+        p.tw += 0.02;
         if (p.x < -10) p.x = w + 10;
         if (p.x > w + 10) p.x = -10;
         if (p.y < -10) p.y = h + 10;
         if (p.y > h + 10) p.y = -10;
-        const ox = parX * 26 * p.depth;
-        const oy = parY * 26 * p.depth;
-        const alpha = (0.12 + p.depth * 0.32).toFixed(2);
+        const ox = parX * 30 * p.depth;
+        const oy = parY * 30 * p.depth;
+        const alpha = ((0.08 + p.depth * 0.28) * (0.6 + 0.4 * Math.sin(p.tw))).toFixed(3);
         const glow = ctx.createRadialGradient(p.x + ox, p.y + oy, 0, p.x + ox, p.y + oy, p.r * 5);
         glow.addColorStop(0, "rgba(" + p.hue + "," + alpha + ")");
         glow.addColorStop(1, "rgba(" + p.hue + ",0)");
@@ -1387,14 +1834,13 @@
         ctx.fillStyle = glow;
         ctx.fill();
       }
-      ctx.restore();
       requestAnimationFrame(tick);
     }
     if (!reduceMotion) tick();
   })();
 
   /* ============================================================
-     3. 3D КНИГА
+     4. 3D КНИГА
   ============================================================ */
   (function initBook() {
     const scaleEl  = document.getElementById("bookScale");
@@ -1408,23 +1854,8 @@
     const nextBtn  = document.getElementById("nextBtn");
     const pages    = Array.prototype.slice.call(document.querySelectorAll(".page"));
     const total    = pages.length;
-
-    // Определяем, мобильное ли устройство
- const isMobile = window.innerWidth <= 768;
-
-let pageText = "Ваш текст книги...";
-
-if (isMobile) {
-  // Оставляем 70% символов текста
-  const length70Percent = Math.floor(pageText.length * 0.7);
-  pageText = pageText.substring(0, length70Percent) + '...';
-}
-    // На телефоне уменьшаем ширину под размер экрана, а высоту считаем пропорционально
-    const mobileWidth = isMobile ? Math.min(window.innerWidth - 32, 400) : 720;
-    const mobileHeight = isMobile ? Math.round(mobileWidth * 1.5) : 900;
-
-    const SPREAD = { pw: mobileWidth, ph: mobileHeight, maxScale: 1.8 };
-    const SINGLE = { pw: mobileWidth, ph: mobileHeight, maxScale: 2.0 };
+    const SPREAD = { pw: 720, ph: 900, maxScale: 1.8 };
+    const SINGLE = { pw: 720, ph: 900, maxScale: 2.0 };
     const SPREAD_MIN_WIDTH = 880;
 
     let current = 0;
@@ -1442,8 +1873,32 @@ if (isMobile) {
     const dots = Array.prototype.slice.call(dotsWrap.children);
 
     function layout() {
+      const isMobile = window.innerWidth <= 768;
       const cs = getComputedStyle(showcase);
       const avail = showcase.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+
+      if (isMobile) {
+        // На мобильном книга строго одиночная (не двухстраничный разворот)
+        // и центрируется без смещения первой страницы влево
+        spread = false;
+        pw = Math.min(avail, 420);
+        const mobileH = Math.min(Math.round(pw * 1.55), Math.max(540, Math.round(window.innerHeight * 0.72)));
+        scaleEl.style.width  = pw + "px";
+        scaleEl.style.height = mobileH + "px";
+        scaleEl.style.setProperty("--s", "1");
+        scaleEl.style.setProperty("--pw", pw + "px");
+        scaleEl.style.setProperty("--ph", mobileH + "px");
+        scaleEl.style.setProperty("--hinge", "0px");
+        scaleEl.classList.remove("spread", "has-left");
+        scaleEl.classList.add("single");
+        bookEl.style.setProperty("--ry", "0deg");
+        bookEl.style.setProperty("--rx", "0deg");
+        viewport.style.height = Math.ceil(mobileH + 12) + "px";
+        shiftEl.style.transform = "translateX(0)";
+        render();
+        return;
+      }
+
       spread = avail >= SPREAD_MIN_WIDTH;
       const cfg = spread ? SPREAD : SINGLE;
       pw = cfg.pw;
@@ -1475,7 +1930,7 @@ if (isMobile) {
       prevBtn.disabled = current === 0;
       nextBtn.disabled = current === total - 1;
       countEl.textContent = (current + 1) + " / " + total;
-      scaleEl.classList.toggle("has-left", current > 0);
+      scaleEl.classList.toggle("has-left", spread && current > 0);
       scaleEl.classList.toggle("at-end", current === total - 1);
       shiftEl.style.transform = (spread && current === 0) ? "translateX(" + (-pw / 2) + "px)" : "translateX(0)";
     }
@@ -1519,13 +1974,14 @@ if (isMobile) {
       });
     }
 
+    window.addEventListener("resize", layout, { passive: true });
+    window.addEventListener("orientationchange", layout, { passive: true });
     if ("ResizeObserver" in window) new ResizeObserver(layout).observe(showcase);
-    else window.addEventListener("resize", layout);
     layout();
   })();
 
   /* ============================================================
-     4. ПОДСВЕТКА МЕНЮ
+     5. ПОДСВЕТКА МЕНЮ
   ============================================================ */
   (function initNav() {
     const links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
@@ -1546,7 +2002,27 @@ if (isMobile) {
   })();
 
   /* ============================================================
-     5. БОКОВЫЕ ТЕРМИНАЛЫ СТАТИСТИКИ
+     6. ПОЯВЛЕНИЕ БЛОКОВ ПРИ ПРОКРУТКЕ
+  ============================================================ */
+  (function initReveal() {
+    const items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (!("IntersectionObserver" in window) || reduceMotion) {
+      items.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    items.forEach(function (el, i) {
+      if (el.closest(".hero")) el.style.transitionDelay = (Math.min(i, 6) * 0.08) + "s";
+      io.observe(el);
+    });
+  })();
+
+  /* ============================================================
+     7. БОКОВЫЕ ТЕРМИНАЛЫ СТАТИСТИКИ
   ============================================================ */
   (function initSidePanels() {
     const leftPanel = document.getElementById("panelLeft");
@@ -1566,6 +2042,7 @@ if (isMobile) {
     }
 
     function updatePanels() {
+      if (window.innerWidth < 1620) return;
       const scrollTop = Math.round(window.scrollY);
       const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - window.innerHeight;
       const progress = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
